@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,7 +16,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -175,4 +182,26 @@ public class DriveSubsystem extends SubsystemBase {
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
+
+  // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
+public CommandBase followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+  return Commands.sequence(Commands.runOnce(() -> {
+         // Reset odometry for the first path you run during auto
+         if(isFirstPath){
+             this.resetOdometry(traj.getInitialHolonomicPose());
+         }
+       }),
+       new PPSwerveControllerCommand(
+           traj, 
+           this::getPose, // Pose supplier
+           DriveConstants.kDriveKinematics, // SwerveDriveKinematics
+           new PIDController(AutoConstants.kPXController, 0, 0), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+           new PIDController(AutoConstants.kPYController, 0, 0), // Y controller (usually the same values as X controller)
+           new PIDController(AutoConstants.kPThetaController, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+           this::setModuleStates, // Module states consumer
+           AutoConstants.kMirrorPathByAlliance, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+           this // Requires this drive subsystem
+       )
+   );
+}
 }
