@@ -35,7 +35,6 @@ public class RobotContainer {
   // Autonomous selector on dashboard
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
   private GenericEntry kAutoStartDelaySeconds;
-  private final AutoPlans m_paths = new AutoPlans();
  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -51,7 +50,7 @@ public class RobotContainer {
                                          .withProperties((Map.of("Min", 0, "Max", 10, "Block increment", 1)))
                                          .getEntry();
     autoChooser.setDefaultOption("Nothing", Commands.waitSeconds(5));
-    autoChooser.addOption("Example Path", m_paths.examplePathCommand(m_robotDrive));
+    autoChooser.addOption("Example Path", AutoPlans.examplePathCommand(m_robotDrive));
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(

@@ -22,7 +22,7 @@ public class AutoPlans {
    *
    * @return the command to run in autonomous
    */
-  public CommandBase examplePathCommand(DriveSubsystem drive) {
+  public static CommandBase examplePathCommand(DriveSubsystem drive) {
 
     PathPlannerTrajectory examplePath = PathPlanner
         .loadPath(
