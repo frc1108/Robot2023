@@ -32,7 +32,7 @@ public class AutoPlans {
                AutoConstants.kMaxAccelerationMetersPerSecondSquared));
 
     return drive.followTrajectoryCommand(examplePath, true)
-                       .andThen(() -> drive.drive(0, 0, 0, false));
+                       .andThen(() -> drive.drive(0, 0, 0, false, false));
   }
 
 }
