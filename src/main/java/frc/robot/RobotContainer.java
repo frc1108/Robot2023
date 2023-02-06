@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -51,6 +52,7 @@ public class RobotContainer {
                                          .getEntry();
     autoChooser.setDefaultOption("Nothing", Commands.waitSeconds(5));
     autoChooser.addOption("Example Path", AutoPlans.examplePathCommand(m_robotDrive));
+    SmartDashboard.putData("Auto Chooser",autoChooser);
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
