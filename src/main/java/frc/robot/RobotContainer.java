@@ -13,10 +13,13 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import java.util.Map;
@@ -29,9 +32,14 @@ import java.util.Map;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
+  private final ClawSubsystem m_claw = new ClawSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  CommandXboxController m_driverController = new CommandXboxController(
+                                             OIConstants.kDriverControllerPort);
+  CommandXboxController m_operatorController = new CommandXboxController(
+                                             OIConstants.kOperatorControllerPort);
 
   // Autonomous selector on dashboard
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -77,10 +85,23 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+
+    // Set drive wheels in x pattern to keep in place
+    m_driverController.rightBumper().whileTrue(Commands.run(
+            m_robotDrive::setX));
+
+    // Manually control elevator with Left POV, a and b buttons
+    m_operatorController.povUp().and(m_operatorController.x())
+      .onTrue(m_elevator.upCommand());
+    m_operatorController.povUp().and(m_operatorController.y())
+      .onTrue(m_elevator.downCommand());
+
+    // Manually control claw with Down POV, a and b buttons
+    m_operatorController.povDown().and(m_operatorController.a())
+    .onTrue(m_claw.gripCommand());
+  m_operatorController.povDown().and(m_operatorController.b())
+    .onTrue(m_claw.releaseCommand());
+    
   }
 
   /**
