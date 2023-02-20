@@ -118,6 +118,7 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
     public static final double kDriveDeadband = 0.05;
   }
 
@@ -141,4 +142,51 @@ public final class Constants {
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
   }
+
+  public static final class SparkMaxCanId {
+    public static final int kArmMotorCanId = 21;
+    public static final int kSliderMotorCanId = 31;
+    // public static final int kIntakeFrontMotorCanId = 51;
+    // public static final int kIntakeBackMotorCanId = 52;
+  }
+
+  public static final class ArmConstants {
+    public static final double kSportGearRatio = 20.0;
+    public static final double kSportPinionPitchInches = 1.125;
+    public static final double kChainCenterDistanceInches = 6;
+
+    public static final double kSVolts = 0.11356;
+    public static final double kGVolts = 0.29175;
+    public static final double kVVoltSecondPerRad = 1.5928;
+    public static final double kAVoltSecondSquaredPerRad = 0.030171;
+    public static final double kMaxVelocityRadPerSecond = 1.5;
+    public static final double kMaxAccelerationRadPerSecSquared = 4;
+    public static final double kArmOffsetRads = -1.3645; //Units.degreesToRadians(78); //Starting angle
+
+    public static final double kP = 0.000078697;
+    public static final double kPVel = 5.534E-11;
+    public static final double kI = 0;
+    public static final double kD = 0.00002194;
+    public static final double kDVel = 0;
+    public static final double kMaxPositionErrorRad = 0.7854;
+    public static final double kMaxVelocityErrorRadPerSec = 1.8656;
+    public static final double kControlEffortVolts = 7;
+
+
+
+    public static final double kMaxArmSpeedRpm = 
+      NeoMotorConstants.kFreeSpeedRpm / (
+        kSportGearRatio * kChainCenterDistanceInches * 2 /
+        kSportPinionPitchInches);
+    public static final double kMaxArmRadiansPerSecond =
+      Units.rotationsPerMinuteToRadiansPerSecond(kMaxArmSpeedRpm);
+  }
+
+  public static final class REVPHConstants {
+    public static final int kForwardElevator = 4;
+    public static final int kReverseElevator = 5;
+    public static final int kForwardClaw = 6;
+    public static final int kReverseClaw = 7;
+  }
+
 }
