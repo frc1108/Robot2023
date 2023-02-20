@@ -4,17 +4,35 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.REVPHConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-  /* TODO Elevator solenoid (single or double) */
+  private final DoubleSolenoid m_piston = new DoubleSolenoid(
+                                            PneumaticsModuleType.REVPH,
+                                            REVPHConstants.kForwardElevator,
+                                            REVPHConstants.kReverseElevator);
   
   /** Creates a new ElevatorSubsystem. */
-  public ElevatorSubsystem() {}
+  public ElevatorSubsystem() {
+    m_piston.set(Value.kReverse);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public CommandBase upCommand() {
+    return runOnce(() -> m_piston.set(Value.kForward)).withName("Elevator Out");
+  }
+
+  public CommandBase downCommand() {
+    return runOnce(() -> m_piston.set(Value.kReverse)).withName("Elevator In");
   }
 }
