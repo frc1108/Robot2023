@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
@@ -13,6 +14,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -32,6 +34,7 @@ import java.util.Map;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final ArmSubsystem m_arm = new ArmSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final ClawSubsystem m_claw = new ClawSubsystem();
 
@@ -89,6 +92,14 @@ public class RobotContainer {
     // Set drive wheels in x pattern to keep in place
     m_driverController.rightBumper().whileTrue(Commands.run(
             m_robotDrive::setX));
+
+    // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
+    m_operatorController.a().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
+
+    // Move the arm to neutral position when the 'B' button is pressed.
+    m_operatorController
+        .b()
+        .onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(15) + Constants.ArmConstants.kArmOffsetRads));
 
     // Manually control elevator with Left POV, a and b buttons
     m_operatorController.povUp().and(m_operatorController.x())
