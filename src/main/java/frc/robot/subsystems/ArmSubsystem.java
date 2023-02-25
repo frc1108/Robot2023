@@ -10,6 +10,7 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -19,13 +20,30 @@ import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.SparkMaxCanId;
 
+/**
+ * THE CLAW's arm rotates exerting more force on it from gravity as it 
+ * moves to horizontal (straight out) necessitating a sine(theta) term
+ * adjustment to motor power. Controlling the arm smoothly takes
+ * both the feedforward model using this term along with other terms
+ * that add an arbitrary voltage to the feedback PID control loop that is 
+ * adjusting the output onboard the Spark Max controller based on the 
+ * NEO relative encoder.  
+ * 
+ * Additionally, trapezoidal motion manages smooth acceleration and 
+ * deceleration while keeping the speed in check. We used the WPIlib
+ * example ArmBotOnboard as template code and modified for the Spark Max. 
+ * 
+ * The arm feedforward terms (kS,kG,kA,kV) were found using SysID WPILib tool.
+ * While the feedback terms (kP, kI, kD) are manually tuned.
+ */
 public class ArmSubsystem extends TrapezoidProfileSubsystem {
-  private final CANSparkMax m_motor = new CANSparkMax(SparkMaxCanId.kArmMotorCanId, MotorType.kBrushless);
+  private final CANSparkMax m_motor = new CANSparkMax(SparkMaxCanId.kArmMotorCanId,
+                                                      MotorType.kBrushless);
   private final SparkMaxPIDController m_pid;
   private final RelativeEncoder m_encoder;
 
-private final ArmFeedforward m_feedforward =
-  new ArmFeedforward(
+  private final ArmFeedforward m_feedforward =
+    new ArmFeedforward(
       ArmConstants.kSVolts, ArmConstants.kGVolts,
       ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
 
@@ -33,11 +51,13 @@ private final ArmFeedforward m_feedforward =
 public ArmSubsystem() {
 super(
     new TrapezoidProfile.Constraints(
-        ArmConstants.kMaxVelocityRadPerSecond, ArmConstants.kMaxAccelerationRadPerSecSquared),
+        ArmConstants.kMaxVelocityRadPerSecond, 
+        ArmConstants.kMaxAccelerationRadPerSecSquared),
     ArmConstants.kArmOffsetRads);
 
 m_motor.restoreFactoryDefaults();
 
+// Setup the encoder and pid controller
 m_encoder = m_motor.getEncoder();
 m_pid = m_motor.getPIDController();
 m_pid.setFeedbackDevice(m_encoder);
@@ -49,7 +69,7 @@ m_pid.setFeedbackDevice(m_encoder);
 m_encoder.setPositionConversionFactor(ArmConstants.kArmEncoderPositionFactor);
 m_encoder.setVelocityConversionFactor(ArmConstants.kArmEncoderVelocityFactor);
 
-// Set the PID gains for the turning motor.
+// Set the PID values for the turning motor.
 m_pid.setP(ArmConstants.kP);
 m_pid.setI(ArmConstants.kI);
 m_pid.setD(ArmConstants.kD);
@@ -57,6 +77,7 @@ m_pid.setFF(ArmConstants.kFF);
 m_pid.setOutputRange(ArmConstants.kMinOutput,
         ArmConstants.kMaxOutput);
 
+// Apply current limit and idle mode
 m_motor.setIdleMode(IdleMode.kBrake);
 m_motor.setSmartCurrentLimit(ArmConstants.kArmMotorCurrentLimit);
 
@@ -65,21 +86,36 @@ m_motor.burnFlash();
 }
 
 @Override
+public void periodic() {
+  
+}
+
+@Override
 public void useState(TrapezoidProfile.State setpoint) {
-// Calculate the feedforward from the sepoint
-double feedforward = m_feedforward.calculate(setpoint.position, setpoint.velocity);
-// Add the feedforward to the PID output to get the motor output
-m_pid.setReference(setpoint.position - ArmConstants.kArmOffsetRads , ControlType.kPosition, 0, feedforward);
-// m_motor.set(setSetpoint(
-//     ExampleSmartMotorController.PIDMode.kPosition, setpoint.position, feedforward / 12.0);
+  // Calculate the feedforward from the sepoint
+  double feedforward = m_feedforward.calculate(setpoint.position,
+                                               setpoint.velocity);
+  
+  // Add the feedforward to the PID output to get the motor output
+  m_pid.setReference(setpoint.position - ArmConstants.kArmOffsetRads,
+                     ControlType.kPosition, 0, feedforward);
 }
 
 public CommandBase setArmGoalCommand(double kArmOffsetRads) {
 return Commands.runOnce(() -> setGoal(kArmOffsetRads), this);
-}  
+}
+
+public double getPositionRadians() {
+  return m_encoder.getPosition();
+}
+
+public void resetPosition() {
+  m_encoder.setPosition(ArmConstants.kArmOffsetRads);
+}
+
+public boolean isArmDown() {
+  return m_motor.getReverseLimitSwitch(Type.kNormallyOpen).isPressed();
+}
 
 
-  
-
-//   
 }
