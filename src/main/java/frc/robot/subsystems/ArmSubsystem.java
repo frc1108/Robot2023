@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -46,6 +47,8 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem {
     new ArmFeedforward(
       ArmConstants.kSVolts, ArmConstants.kGVolts,
       ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
+
+  private final SlewRateLimiter m_armSlew = new SlewRateLimiter(ArmConstants.kArmSlewRate);
 
 /** Create a new ArmSubsystem. */
 public ArmSubsystem() {
@@ -103,6 +106,11 @@ public void useState(TrapezoidProfile.State setpoint) {
 
 public CommandBase setArmGoalCommand(double kArmOffsetRads) {
 return Commands.runOnce(() -> setGoal(kArmOffsetRads), this);
+}
+
+public void set(double speed) {
+  speed = m_armSlew.calculate(speed);
+  m_motor.set(speed);
 }
 
 public double getPositionRadians() {

@@ -5,19 +5,22 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.SliderConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.SliderSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -33,10 +36,13 @@ import java.util.Map;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final DriveSubsystem m_swerve = new DriveSubsystem();
   private final ArmSubsystem m_arm = new ArmSubsystem();
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final ClawSubsystem m_claw = new ClawSubsystem();
+  private final SliderSubsystem m_slider = new SliderSubsystem();
+
+  private final Autos autos = new Autos(m_swerve);
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(
@@ -62,20 +68,29 @@ public class RobotContainer {
                                          .withProperties((Map.of("Min", 0, "Max", 10, "Block increment", 1)))
                                          .getEntry();
     autoChooser.setDefaultOption("Nothing", Commands.waitSeconds(5));
-    autoChooser.addOption("Example Path", AutoPlans.examplePathCommand(m_robotDrive));
+    autoChooser.addOption("Example Path", autos.example());
     SmartDashboard.putData("Auto Chooser",autoChooser);
 
     // Configure default commands
-    m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () -> m_robotDrive.drive(
-              -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-              -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-              -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-              true, true),
-            m_robotDrive));
+    m_swerve.setDefaultCommand(
+      new RunCommand(
+        () -> m_swerve.drive(
+          -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+          -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+          -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+          true, true),m_swerve));
+    
+    m_arm.setDefaultCommand(
+      new RunCommand(
+        () -> m_arm.set(-ArmConstants.kMaxArmSpeed*
+          MathUtil.applyDeadband(m_operatorController.getRightY(),
+          ArmConstants.kArmDeadband)),m_arm));
+          
+    m_slider.setDefaultCommand(
+      new RunCommand(
+        () -> m_slider.set(SliderConstants.kMaxSliderSpeed*
+          MathUtil.applyDeadband(m_operatorController.getLeftY(),
+          SliderConstants.kSliderDeadband)),m_slider));
   }
 
   /**
@@ -90,29 +105,27 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     // Set drive wheels in x pattern to keep in place
-    m_driverController.rightBumper().whileTrue(Commands.run(
-            m_robotDrive::setX));
+    m_driverController.rightBumper().whileTrue(Commands.run(m_swerve::setX));
+
+    // Reset gyro when X button is pressed 
+    m_driverController.a().onTrue(Commands.runOnce(()->m_swerve.zeroHeading()));
 
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
-    m_operatorController.a().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
+    // m_operatorController.a().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
 
     // Move the arm to neutral position when the 'B' button is pressed.
-    m_operatorController
-        .b()
-        .onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(15) + Constants.ArmConstants.kArmOffsetRads));
+    // m_operatorController
+    //     .b()
+    //     .onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(15) + Constants.ArmConstants.kArmOffsetRads));
 
-    // Manually control elevator with Left POV, a and b buttons
-    m_operatorController.povUp().and(m_operatorController.x())
-      .onTrue(m_elevator.upCommand());
-    m_operatorController.povUp().and(m_operatorController.y())
-      .onTrue(m_elevator.downCommand());
+    // Elevator control on POV
+    m_operatorController.povUp().onTrue(m_elevator.upCommand());
+    m_operatorController.povDown().onTrue(m_elevator.downCommand());
 
-    // Manually control claw with Down POV, a and b buttons
-    m_operatorController.povDown().and(m_operatorController.a())
-    .onTrue(m_claw.gripCommand());
-  m_operatorController.povDown().and(m_operatorController.b())
-    .onTrue(m_claw.releaseCommand());
-    
+    // Claw control on button A (grip) & X (release)
+    m_operatorController.a().onTrue(m_claw.gripCommand());
+    m_operatorController.x().onTrue(m_claw.releaseCommand());
+  
   }
 
   /**

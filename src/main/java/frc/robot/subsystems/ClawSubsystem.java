@@ -23,7 +23,6 @@ public class ClawSubsystem extends SubsystemBase {
     m_piston.set(Value.kReverse);
   }
   
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

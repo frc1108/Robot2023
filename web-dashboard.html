@@ -1,0 +1,71 @@
+<dashboard-tab
+    tab-name="TeleOperated"
+    slot="tab"
+    source-provider="NetworkTables"
+    selected=""
+>
+    <frc-boolean-box
+        source-provider="NetworkTables"
+        style="transform: translate(58px, 559px);"
+    ></frc-boolean-box>
+    <frc-camera
+        source-provider="NetworkTables"
+        style="transform: translate(347px, 206px); --image-width:350px; --image-height:196.875px; --crosshair-width:2px; --crosshair-color:#ffffff; --image-display:block;"
+        streams="[]"
+    ></frc-camera>
+    <frc-gyro
+        source-provider="NetworkTables"
+        style="transform: translate(0px, 169px);"
+    ></frc-gyro>
+    <frc-field
+        source-key="/SmartDashboard/Field"
+        source-provider="NetworkTables"
+        style="transform: translate(546px, 31px);"
+        width="54.27083"
+        height="26.2916"
+        image="/field-images/2023-field.jpg"
+        top-left-field-corner-x="46"
+        top-left-field-corner-y="36"
+        bottom-right-field-corner-x="1088"
+        bottom-right-field-corner-y="544"
+    >
+    </frc-field>
+    <vaadin-combo-box
+        items="[&quot;Item 1&quot;,&quot;Item 2&quot;,&quot;Item3&quot;]"
+        value="Item 1"
+        has-value=""
+        source-provider="NetworkTables"
+        style="transform: translate(517px, 598px);"
+        focused=""
+        placeholder=""
+    ><input
+            slot="input"
+            value="Item 1"
+            id="vaadin-combo-box-208"
+            autocomplete="off"
+            autocapitalize="off"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            spellcheck="false"
+            autocorrect="off"
+            aria-labelledby=""
+            aria-describedby=""
+            aria-activedescendant="vaadin-combo-box-item-0"
+        ><label
+            slot="label"
+            id="label-vaadin-combo-box-208"
+            for="vaadin-combo-box-208"
+        ></label>
+        <div
+            slot="error-message"
+            id="error-message-vaadin-combo-box-167"
+            hidden=""
+        ></div>
+    </vaadin-combo-box>
+</dashboard-tab>
+<dashboard-tab
+    slot="tab"
+    tab-name="Autonomous"
+    source-provider="NetworkTables"
+></dashboard-tab>
