@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.SparkMaxCanId;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
 /**
  * THE CLAW's arm rotates exerting more force on it from gravity as it 
@@ -110,18 +111,18 @@ return Commands.runOnce(() -> setGoal(kArmOffsetRads), this);
 }
 
 public void set(double speed) {
-  speed = m_armSlew.calculate(speed);
-  m_motor.set(speed);
+  m_motor.set(m_armSlew.calculate(speed));
 }
 
 public CommandBase manualArmOrHold(double speed) {
-  if (speed < ArmConstants.kArmDeadband) {
-    return setArmGoalCommand(getPositionRadians());
+  if (Math.abs(speed) < ArmConstants.kArmDeadband) {
+    return this.setArmGoalCommand(this.getPositionRadians());
   } else {
-    return Commands.run(()->m_motor.set(m_armSlew.calculate(speed)));
+    return Commands.run(()->this.set(speed));
   }
 }
 
+@Log
 public double getPositionRadians() {
   return m_encoder.getPosition();
 }
@@ -130,6 +131,7 @@ public void resetPosition() {
   m_encoder.setPosition(ArmConstants.kArmOffsetRads);
 }
 
+@Log
 public boolean isArmDown() {
   return m_motor.getReverseLimitSwitch(Type.kNormallyOpen).isPressed();
 }
