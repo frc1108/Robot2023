@@ -22,6 +22,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.utils.SwerveUtils;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -249,6 +250,23 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
    */
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  @Log
+  public double getRobotPitch() {
+    return m_gyro.getXComplementaryAngle();
+  }
+
+  public CommandBase autoBalance() {
+    return Commands.sequence(
+      Commands.run(
+        ()->this.drive(1.2/DriveConstants.kMaxSpeedMetersPerSecond,
+                       0,0,true,true),this).until(()->this.getRobotPitch()>=13),
+      Commands.run(
+        ()->this.drive(0.1/DriveConstants.kMaxSpeedMetersPerSecond,
+                       0,0,true,true),this).until(()->this.getRobotPitch()<=12),
+      Commands.run(
+        ()->this.drive(0,0,0,true,true),this).andThen(this::setX));
   }
 
   // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
