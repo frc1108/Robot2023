@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.SparkMaxCanId;
+import io.github.oblarg.oblog.Loggable;
 
 /**
  * THE CLAW's arm rotates exerting more force on it from gravity as it 
@@ -37,7 +38,7 @@ import frc.robot.Constants.SparkMaxCanId;
  * The arm feedforward terms (kS,kG,kA,kV) were found using SysID WPILib tool.
  * While the feedback terms (kP, kI, kD) are manually tuned.
  */
-public class ArmSubsystem extends TrapezoidProfileSubsystem {
+public class ArmSubsystem extends TrapezoidProfileSubsystem implements Loggable{
   private final CANSparkMax m_motor = new CANSparkMax(SparkMaxCanId.kArmMotorCanId,
                                                       MotorType.kBrushless);
   private final SparkMaxPIDController m_pid;
@@ -111,6 +112,14 @@ return Commands.runOnce(() -> setGoal(kArmOffsetRads), this);
 public void set(double speed) {
   speed = m_armSlew.calculate(speed);
   m_motor.set(speed);
+}
+
+public CommandBase manualArmOrHold(double speed) {
+  if (speed < ArmConstants.kArmDeadband) {
+    return setArmGoalCommand(getPositionRadians());
+  } else {
+    return Commands.run(()->m_motor.set(m_armSlew.calculate(speed)));
+  }
 }
 
 public double getPositionRadians() {

@@ -1,0 +1,14 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/RobotContainer/m_arm": "Subsystem",
+      "/Shuffleboard/RobotContainer/m_claw": "Subsystem",
+      "/Shuffleboard/RobotContainer/m_elevator": "Subsystem",
+      "/Shuffleboard/RobotContainer/m_slider": "Subsystem",
+      "/Shuffleboard/RobotContainer/m_swerve": "Subsystem",
+      "/Shuffleboard/RobotContainer/m_vision": "Subsystem",
+      "/SmartDashboard/Auto Chooser": "String Chooser"
+    }
+  }
+}

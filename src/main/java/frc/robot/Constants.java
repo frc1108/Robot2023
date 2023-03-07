@@ -208,4 +208,9 @@ public final class Constants {
     public static final int kReverseClaw = 7;
   }
 
+  public static final class LedConstants {
+    public static final int kLedPWMPort = 9;
+    public static final int kLedCount = 60;
+  }
+
 }
