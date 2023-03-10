@@ -11,11 +11,13 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import frc.robot.Constants.AutoConstants;
@@ -70,7 +72,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      });
+      }
+      //,new Pose2d(new Translation2d(),new Rotation2d(Units.degreesToRadians(180)))
+  );
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -258,15 +262,18 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
   }
 
   public CommandBase autoBalance() {
-    return Commands.sequence(
-      Commands.run(
-        ()->this.drive(1.2/DriveConstants.kMaxSpeedMetersPerSecond,
-                       0,0,true,true),this).until(()->this.getRobotPitch()>=13),
-      Commands.run(
-        ()->this.drive(0.1/DriveConstants.kMaxSpeedMetersPerSecond,
-                       0,0,true,true),this).until(()->this.getRobotPitch()<=12),
-      Commands.run(
-        ()->this.drive(0,0,0,true,true),this).andThen(this::setX));
+    return Commands.race(
+        Commands.sequence(
+          Commands.run(
+            ()->this.drive(2/DriveConstants.kMaxSpeedMetersPerSecond,
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())>=15),
+          Commands.run(
+            ()->this.drive(0.5/DriveConstants.kMaxSpeedMetersPerSecond,
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=10.8),
+          Commands.run(this::setX,this)),
+        Commands.waitSeconds(15));
+      // Commands.run(
+      //   ()->this.drive(0,0,0,true,true),this));
   }
 
   // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
