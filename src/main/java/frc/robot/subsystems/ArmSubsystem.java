@@ -16,6 +16,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants.ArmConstants;
@@ -115,11 +116,9 @@ public void set(double speed) {
 }
 
 public CommandBase manualArmOrHold(double speed) {
-  if (Math.abs(speed) < ArmConstants.kArmDeadband) {
-    return this.setArmGoalCommand(this.getPositionRadians());
-  } else {
-    return Commands.run(()->this.set(speed));
-  }
+  return Commands.either(setArmGoalCommand(getPositionRadians()),
+                 Commands.run(()->set(speed)),
+                 ()->(Math.abs(speed) < ArmConstants.kArmDeadband));
 }
 
 @Log

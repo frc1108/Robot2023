@@ -192,13 +192,15 @@ public final class Constants {
     public static final double kMaxArmSpeed = 0.4;
     public static final double kArmSlewRate = 2;
     public static final double kArmDeadband = 0.06;
+
+    public static final double kArmHighCubeOffsetRads = Units.degreesToRadians(5);
   }
 
   public static final class SliderConstants {
     public static final int kSliderMotorCurrentLimit = 20;
     public static final double kSliderDeadband = 0.06;
     public static final double kSliderSlewRate = 2;
-    public static final double kMaxSliderSpeed = 0.5;
+    public static final double kMaxSliderSpeed = 0.95;
   }
 
   public static final class REVPHConstants {

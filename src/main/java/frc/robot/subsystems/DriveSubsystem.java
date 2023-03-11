@@ -266,10 +266,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
         Commands.sequence(
           Commands.run(
             ()->this.drive(2/DriveConstants.kMaxSpeedMetersPerSecond,
-                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())>=15),
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())>=14.3),
           Commands.run(
-            ()->this.drive(0.5/DriveConstants.kMaxSpeedMetersPerSecond,
-                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=10.8),
+            ()->this.drive(0.3/DriveConstants.kMaxSpeedMetersPerSecond,
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=12.5),
           Commands.run(this::setX,this)),
         Commands.waitSeconds(15));
       // Commands.run(

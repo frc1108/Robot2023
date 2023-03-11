@@ -22,6 +22,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.SliderSubsystem;
+import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.VisionSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,6 +46,7 @@ public class RobotContainer {
   @Log private final ClawSubsystem m_claw = new ClawSubsystem();
   @Log private final SliderSubsystem m_slider = new SliderSubsystem();
   @Log private final VisionSubsystem m_vision = new VisionSubsystem();
+  @Log private final Superstructure m_superStruct = new Superstructure(m_arm, m_slider, m_elevator, m_claw);
 
   private final Autos autos = new Autos(m_swerve);
   private final LEDSubsystem m_leds = new LEDSubsystem();
@@ -74,6 +76,7 @@ public class RobotContainer {
                                          .getEntry();
     autoChooser.setDefaultOption("Nothing", Commands.waitSeconds(5));
     autoChooser.addOption("Example Path", autos.example());
+    autoChooser.addOption("AutoBalance",m_swerve.autoBalance());
     SmartDashboard.putData("Auto Chooser",autoChooser);
 
     // Configure default commands
@@ -90,6 +93,12 @@ public class RobotContainer {
         () -> m_arm.set(-ArmConstants.kMaxArmSpeed*
           MathUtil.applyDeadband(m_operatorController.getRightY(),
           ArmConstants.kArmDeadband)),m_arm));
+
+    // m_arm.setDefaultCommand(
+    //   m_arm.manualArmOrHold(-ArmConstants.kMaxArmSpeed*
+    //     MathUtil.applyDeadband(m_operatorController.getRightY(),
+    //     ArmConstants.kArmDeadband))
+    // );
           
     m_slider.setDefaultCommand(
       new RunCommand(
@@ -112,11 +121,17 @@ public class RobotContainer {
     // Set drive wheels in x pattern to keep in place
     m_driverController.rightBumper().whileTrue(Commands.run(m_swerve::setX));
 
-    // Reset gyro when X button is pressed 
+    // Reset gyro when A button is pressed 
     m_driverController.a().onTrue(Commands.runOnce(()->m_swerve.zeroHeading()));
 
     // Go through LED Patterns on driver button
     m_driverController.b().onTrue(Commands.runOnce(()->m_leds.nextPattern(),m_leds));
+
+    // Autobalance testing
+    // m_driverController.y().whileTrue(m_swerve.autoBalance());
+
+    // Auto score testing
+    // m_driverController.x().whileTrue(m_superStruct.scoreCubeAutoCommand());
 
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
     // m_operatorController.a().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
@@ -151,5 +166,9 @@ public class RobotContainer {
     return Commands.sequence(
       Commands.waitSeconds(kAutoStartDelaySeconds.getDouble(0)),
       autoChooser.getSelected());
+  }
+
+  public void resetAutoHeading() {
+    m_swerve.zeroHeading();
   }
 }
