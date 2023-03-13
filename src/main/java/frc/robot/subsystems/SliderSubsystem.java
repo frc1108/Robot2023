@@ -12,8 +12,9 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SliderConstants;
 import frc.robot.Constants.SparkMaxCanId;
+import io.github.oblarg.oblog.Loggable;
 
-public class SliderSubsystem extends SubsystemBase {
+public class SliderSubsystem extends SubsystemBase implements Loggable {
   private final CANSparkMax m_motor = new CANSparkMax(SparkMaxCanId.kSliderMotorCanId,
                                                       MotorType.kBrushless);
   

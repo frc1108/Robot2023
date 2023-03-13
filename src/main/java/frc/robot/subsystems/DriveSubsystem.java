@@ -11,21 +11,25 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.utils.SwerveUtils;
+import frc.robot.utils.SwerveUtils;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class DriveSubsystem extends SubsystemBase {
+public class DriveSubsystem extends SubsystemBase implements Loggable {
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
@@ -68,7 +72,9 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      });
+      }
+      //,new Pose2d(new Translation2d(),new Rotation2d(Units.degreesToRadians(180)))
+  );
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -248,6 +254,26 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  @Log
+  public double getRobotPitch() {
+    return m_gyro.getXComplementaryAngle();
+  }
+
+  public CommandBase autoBalance() {
+    return Commands.race(
+        Commands.sequence(
+          Commands.run(
+            ()->this.drive(2/DriveConstants.kMaxSpeedMetersPerSecond,
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())>=14.3),
+          Commands.run(
+            ()->this.drive(0.3/DriveConstants.kMaxSpeedMetersPerSecond,
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=12.5),
+          Commands.run(this::setX,this)),
+        Commands.waitSeconds(15));
+      // Commands.run(
+      //   ()->this.drive(0,0,0,true,true),this));
   }
 
   // Assuming this method is part of a drivetrain subsystem that provides the necessary methods

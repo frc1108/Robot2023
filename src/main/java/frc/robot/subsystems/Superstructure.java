@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,15 +26,25 @@ public class Superstructure extends SubsystemBase {
   }
 
 // 1
-  public CommandBase stowCommand(){
+  public CommandBase scoreCubeAutoCommand(){
     return Commands.sequence(
-      Commands.print("Stow arm"),
+      Commands.print("Score auto cube"),
+      m_claw.gripCommand(),
+      Commands.waitSeconds(0.1),
+      m_elevator.upCommand(),
+      Commands.waitSeconds(0.25),
+      m_arm.setArmGoalCommand(ArmConstants.kArmHighCubeOffsetRads),
+      Commands.waitSeconds(0.25),
+      Commands.runOnce(()->m_slide.set(0.9),m_slide),
+      Commands.waitSeconds(0.75),
+      Commands.runOnce(()->m_slide.set(0), m_slide),
       m_claw.releaseCommand(),
-      Commands.waitSeconds(0.05),
-      //m_slide.
+      Commands.runOnce(()->m_slide.set(-0.9),m_slide),
+      Commands.waitSeconds(-0.75),
+      Commands.runOnce(()->m_slide.set(0),m_slide),
       m_elevator.downCommand(),
       Commands.waitSeconds(0.1),
-      m_arm.setArmGoalCommand(ArmConstants.kArmOffsetRads)
+      m_arm.setArmGoalCommand(ArmConstants.kArmOffsetRads+Units.degreesToRadians(15))
     );
   }
 

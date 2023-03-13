@@ -10,8 +10,9 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.REVPHConstants;
+import io.github.oblarg.oblog.Loggable;
 
-public class ElevatorSubsystem extends SubsystemBase {
+public class ElevatorSubsystem extends SubsystemBase implements Loggable {
 
   private final DoubleSolenoid m_piston = new DoubleSolenoid(
                                             PneumaticsModuleType.REVPH,
