@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -53,6 +55,8 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem implements Loggable{
 
   private final SlewRateLimiter m_armSlew = new SlewRateLimiter(ArmConstants.kArmSlewRate);
 
+  private double m_goal = ArmConstants.kArmOffsetRads;
+
 /** Create a new ArmSubsystem. */
 public ArmSubsystem() {
 super(
@@ -92,8 +96,9 @@ m_motor.burnFlash();
 }
 
 @Override
-public void periodic() {
-  
+public void periodic(){
+  super.setGoal(m_goal);
+  super.periodic();
 }
 
 @Override
@@ -107,8 +112,8 @@ public void useState(TrapezoidProfile.State setpoint) {
                      ControlType.kPosition, 0, feedforward);
 }
 
-public CommandBase setArmGoalCommand(double kArmOffsetRads) {
-return Commands.runOnce(() -> setGoal(kArmOffsetRads), this);
+public CommandBase setArmGoalCommand(double goal) {
+return Commands.runOnce(() -> setArmGoal(goal), this);
 }
 
 public void set(double speed) {
@@ -116,14 +121,27 @@ public void set(double speed) {
 }
 
 public CommandBase manualArmOrHold(double speed) {
-  return Commands.either(setArmGoalCommand(getPositionRadians()),
-                 Commands.run(()->set(speed)),
+  return Commands.either(setArmGoalCommand(getPositionRadians()).withName("auto arm"),
+                 Commands.run(()->set(speed)).withName("manual arm"),
                  ()->(Math.abs(speed) < ArmConstants.kArmDeadband));
 }
 
 @Log
 public double getPositionRadians() {
-  return m_encoder.getPosition();
+  return m_encoder.getPosition() + ArmConstants.kArmOffsetRads;
+}
+
+public CommandBase setArmManual(DoubleSupplier speed) {
+
+  return Commands.run(()->setArmGoal(getPositionRadians()+speed.getAsDouble()/2*Math.PI));
+}
+
+public double getArmGoal() {
+  return m_goal;
+}
+
+public void setArmGoal(double goal) {
+  m_goal = goal;
 }
 
 public void resetPosition() {
@@ -134,6 +152,7 @@ public void resetPosition() {
 public boolean isArmDown() {
   return m_motor.getReverseLimitSwitch(Type.kNormallyOpen).isPressed();
 }
+
 
 
 }

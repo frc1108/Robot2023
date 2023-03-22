@@ -88,17 +88,23 @@ public class RobotContainer {
           -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
           true, true),m_swerve));
     
-    m_arm.setDefaultCommand(
-      new RunCommand(
-        () -> m_arm.set(-ArmConstants.kMaxArmSpeed*
-          MathUtil.applyDeadband(m_operatorController.getRightY(),
-          ArmConstants.kArmDeadband)),m_arm));
+    // m_arm.setDefaultCommand(
+    //   new RunCommand(
+    //     () -> m_arm.set(-ArmConstants.kMaxArmSpeed*
+    //       MathUtil.applyDeadband(m_operatorController.getRightY(),
+    //       ArmConstants.kArmDeadband)),m_arm));
 
     // m_arm.setDefaultCommand(
     //   m_arm.manualArmOrHold(-ArmConstants.kMaxArmSpeed*
     //     MathUtil.applyDeadband(m_operatorController.getRightY(),
     //     ArmConstants.kArmDeadband))
     // );
+
+    m_arm.setDefaultCommand(
+      m_arm.setArmManual(()->-ArmConstants.kMaxArmSpeed*
+      MathUtil.applyDeadband(m_operatorController.getRightY(),
+      ArmConstants.kArmDeadband))
+    );
           
     m_slider.setDefaultCommand(
       new RunCommand(
@@ -128,18 +134,18 @@ public class RobotContainer {
     m_driverController.b().onTrue(Commands.runOnce(()->m_leds.nextPattern(),m_leds));
 
     // Autobalance testing
-    // m_driverController.y().whileTrue(m_swerve.autoBalance());
+    //m_driverController.y().whileTrue(m_swerve.autoBalance());
 
     // Auto score testing
-    // m_driverController.x().whileTrue(m_superStruct.scoreCubeAutoCommand());
+    m_driverController.x().onTrue(m_superStruct.scoreCubeAutoCommand());
 
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
-    // m_operatorController.a().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
+    m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
 
     // Move the arm to neutral position when the 'B' button is pressed.
-    // m_operatorController
-    //     .b()
-    //     .onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(15) + Constants.ArmConstants.kArmOffsetRads));
+    m_operatorController
+        .b()
+        .onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(15) + Constants.ArmConstants.kArmOffsetRads));
 
     // Elevator control on POV
     m_operatorController.povUp().onTrue(m_elevator.upCommand());

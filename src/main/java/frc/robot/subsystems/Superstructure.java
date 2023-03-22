@@ -30,9 +30,9 @@ public class Superstructure extends SubsystemBase {
     return Commands.sequence(
       Commands.print("Score auto cube"),
       m_claw.gripCommand(),
-      Commands.waitSeconds(0.1),
-      m_elevator.upCommand(),
       Commands.waitSeconds(0.25),
+      m_elevator.upCommand(),
+      Commands.waitSeconds(0.5),
       m_arm.setArmGoalCommand(ArmConstants.kArmHighCubeOffsetRads),
       Commands.waitSeconds(0.25),
       Commands.runOnce(()->m_slide.set(0.9),m_slide),
