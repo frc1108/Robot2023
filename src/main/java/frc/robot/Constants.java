@@ -200,7 +200,7 @@ public final class Constants {
     public static final int kSliderMotorCurrentLimit = 20;
     public static final double kSliderDeadband = 0.06;
     public static final double kSliderSlewRate = 2;
-    public static final double kMaxSliderSpeed = 0.95;
+    public static final double kMaxSliderSpeed = 0.75;
   }
 
   public static final class REVPHConstants {
