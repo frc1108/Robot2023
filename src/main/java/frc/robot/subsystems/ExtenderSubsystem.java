@@ -20,7 +20,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.SliderConstants;
 import frc.robot.Constants.SparkMaxCanId;
 import io.github.oblarg.oblog.Loggable;
@@ -97,9 +96,9 @@ public double getPositionMeters() {
   return m_encoder.getPosition() + SliderConstants.kSliderOffsetMeters;
 }
 
-public CommandBase setArmManual(DoubleSupplier speed) {
+public CommandBase setSliderManual(DoubleSupplier speed) {
 
-  return Commands.run(()->setSliderGoal(getPositionMeters()+speed.getAsDouble()/2*Math.PI));
+  return Commands.run(()->setSliderGoal(getPositionMeters()+speed.getAsDouble()/12));
 }
 
 public double getSliderGoal() {
@@ -108,6 +107,10 @@ public double getSliderGoal() {
 
 public void setSliderGoal(double goal) {
   m_goal = goal;
+}
+
+public void set(double speed) {
+  m_motor.set(m_sliderSlew.calculate(speed));
 }
 
 public void resetPosition() {
