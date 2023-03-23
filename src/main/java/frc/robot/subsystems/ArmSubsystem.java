@@ -14,6 +14,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -112,18 +113,18 @@ public void useState(TrapezoidProfile.State setpoint) {
 }
 
 public CommandBase setArmGoalCommand(double goal) {
-return Commands.runOnce(() -> setArmGoal(goal));
+return Commands.runOnce(() -> setArmGoal(goal), this);
 }
 
-public void set(double speed) {
-  m_motor.set(m_armSlew.calculate(speed));
-}
+// public void set(double speed) {
+//   m_motor.set(m_armSlew.calculate(speed));
+// }
 
-public CommandBase manualArmOrHold(double speed) {
-  return Commands.either(setArmGoalCommand(getPositionRadians()).withName("auto arm"),
-                 Commands.run(()->set(speed)).withName("manual arm"),
-                 ()->(Math.abs(speed) < ArmConstants.kArmDeadband));
-}
+// public CommandBase manualArmOrHold(double speed) {
+//   return Commands.either(setArmGoalCommand(getPositionRadians()).withName("auto arm"),
+//                  Commands.run(()->set(speed)).withName("manual arm"),
+//                  ()->(Math.abs(speed) < ArmConstants.kArmDeadband));
+// }
 
 @Log
 public double getPositionRadians() {
@@ -131,8 +132,7 @@ public double getPositionRadians() {
 }
 
 public CommandBase setArmManual(DoubleSupplier speed) {
-
-  return Commands.run(()->setArmGoal(getPositionRadians()+speed.getAsDouble()/2*Math.PI),this);
+  return Commands.run(()->setArmGoal(getArmGoal()+speed.getAsDouble()/(2*Math.PI)),this);
 }
 
 @Log
@@ -141,16 +141,23 @@ public double getArmGoal() {
 }
 
 public void setArmGoal(double goal) {
-  m_goal = goal;
+  
+  m_goal = MathUtil.clamp(goal,ArmConstants.kArmOffsetRads,ArmConstants.kArmMaxRads);
 }
 
 public void resetPosition() {
   m_encoder.setPosition(ArmConstants.kArmOffsetRads);
+  m_goal = ArmConstants.kArmOffsetRads;
 }
 
 @Log
 public boolean isArmDown() {
   return m_motor.getReverseLimitSwitch(Type.kNormallyOpen).isPressed();
+}
+
+@Log
+public boolean isArmUp() {
+  return m_motor.getForwardLimitSwitch(Type.kNormallyOpen).isPressed();
 }
 
 

@@ -79,6 +79,7 @@ public class RobotContainer {
     autoChooser.setDefaultOption("Nothing", Commands.waitSeconds(5));
     autoChooser.addOption("Example Path", autos.example());
     autoChooser.addOption("AutoBalance",m_swerve.autoBalance());
+    autoChooser.addOption("High Cube",m_superStruct.scoreCubeAutoCommand());
     SmartDashboard.putData("Auto Chooser",autoChooser);
 
     // Configure default commands
@@ -102,17 +103,17 @@ public class RobotContainer {
     //     ArmConstants.kArmDeadband))
     // );
 
-    // m_arm.setDefaultCommand(
-    //   m_arm.setArmManual(()->-ArmConstants.kMaxArmSpeed*
-    //   MathUtil.applyDeadband(m_operatorController.getRightY(),
-    //   ArmConstants.kArmDeadband))
-    // );
+    m_arm.setDefaultCommand(
+      m_arm.setArmManual(()->-ArmConstants.kMaxArmSpeed*
+      MathUtil.applyDeadband(m_operatorController.getRightY(),
+      ArmConstants.kArmDeadband))
+    );
           
-  //   m_slider.setDefaultCommand(
-  //     new RunCommand(
-  //       () -> m_slider.set(SliderConstants.kMaxSliderSpeed*
-  //         MathUtil.applyDeadband(m_operatorController.getLeftY(),
-  //         SliderConstants.kSliderDeadband)),m_slider));
+    m_slider.setDefaultCommand(
+      m_slider.setSliderManual(()->SliderConstants.kMaxSliderSpeed*
+          MathUtil.applyDeadband(m_operatorController.getLeftY(),
+          SliderConstants.kSliderDeadband))
+    );
   }
 
   /**
@@ -142,8 +143,8 @@ public class RobotContainer {
     m_driverController.x().onTrue(m_superStruct.scoreCubeAutoCommand());
 
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
-    // m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
-    m_operatorController.y().onTrue(m_slider.setSliderGoalCommand(-Units.inchesToMeters(0.5)));
+    m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
+    // m_operatorController.y().onTrue(m_slider.setSliderGoalCommand(-Units.inchesToMeters(0.5)));
     m_operatorController.b().onTrue(m_slider.setSliderGoalCommand(-Units.inchesToMeters(12)));
 
     // Move the arm to neutral position when the 'B' button is pressed.

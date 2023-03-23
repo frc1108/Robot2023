@@ -14,9 +14,11 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
@@ -103,8 +105,7 @@ public double getPositionMeters() {
 }
 
 public CommandBase setSliderManual(DoubleSupplier speed) {
-
-  return Commands.run(()->setSliderGoal(getPositionMeters()+speed.getAsDouble()/12));
+  return Commands.run(()->setSliderGoal(getSliderGoal()+(speed.getAsDouble()*(Units.inchesToMeters(24)/50))),this);
 }
 
 @Log
@@ -113,11 +114,11 @@ public double getSliderGoal() {
 }
 
 public void setSliderGoal(double goal) {
-  m_goal = goal;
+  m_goal = MathUtil.clamp(goal,SliderConstants.kSliderMaxMeters,SliderConstants.kSliderOffsetMeters);
 }
 
 public CommandBase setSliderGoalCommand(double goal) {
-  return Commands.runOnce(() -> setSliderGoal(goal));
+  return Commands.runOnce(() -> setSliderGoal(goal),this);
   }
 
 public void set(double speed) {
