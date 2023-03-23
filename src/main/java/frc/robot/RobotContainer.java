@@ -20,8 +20,9 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ExtenderSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.subsystems.SliderSubsystem;
+// import frc.robot.subsystems.SliderSubsystem;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.VisionSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
@@ -44,9 +45,10 @@ public class RobotContainer {
   @Log private final ArmSubsystem m_arm = new ArmSubsystem();
   @Log private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   @Log private final ClawSubsystem m_claw = new ClawSubsystem();
-  @Log private final SliderSubsystem m_slider = new SliderSubsystem();
+  // @Log private final SliderSubsystem m_slider = new SliderSubsystem();
+   @Log private final ExtenderSubsystem m_slider = new ExtenderSubsystem();
   @Log private final VisionSubsystem m_vision = new VisionSubsystem();
-  @Log private final Superstructure m_superStruct = new Superstructure(m_arm, m_slider, m_elevator, m_claw);
+   @Log private final Superstructure m_superStruct = new Superstructure(m_arm, m_slider, m_elevator, m_claw);
 
   private final Autos autos = new Autos(m_swerve);
   private final LEDSubsystem m_leds = new LEDSubsystem();
@@ -106,11 +108,11 @@ public class RobotContainer {
       ArmConstants.kArmDeadband))
     );
           
-    m_slider.setDefaultCommand(
-      new RunCommand(
-        () -> m_slider.set(SliderConstants.kMaxSliderSpeed*
-          MathUtil.applyDeadband(m_operatorController.getLeftY(),
-          SliderConstants.kSliderDeadband)),m_slider));
+  //   m_slider.setDefaultCommand(
+  //     new RunCommand(
+  //       () -> m_slider.set(SliderConstants.kMaxSliderSpeed*
+  //         MathUtil.applyDeadband(m_operatorController.getLeftY(),
+  //         SliderConstants.kSliderDeadband)),m_slider));
   }
 
   /**
@@ -128,16 +130,16 @@ public class RobotContainer {
     m_driverController.rightBumper().whileTrue(Commands.run(m_swerve::setX));
 
     // Reset gyro when A button is pressed 
-    m_driverController.a().onTrue(Commands.runOnce(()->m_swerve.zeroHeading()));
+    m_driverController.a().onTrue(Commands.runOnce(m_swerve::zeroHeading));
 
     // Go through LED Patterns on driver button
-    m_driverController.b().onTrue(Commands.runOnce(()->m_leds.nextPattern(),m_leds));
+    m_driverController.b().onTrue(Commands.runOnce(m_leds::nextPattern,m_leds));
 
     // Autobalance testing
     //m_driverController.y().whileTrue(m_swerve.autoBalance());
 
     // Auto score testing
-    m_driverController.x().onTrue(m_superStruct.scoreCubeAutoCommand());
+    // m_driverController.x().onTrue(m_superStruct.scoreCubeAutoCommand());
 
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
     m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));

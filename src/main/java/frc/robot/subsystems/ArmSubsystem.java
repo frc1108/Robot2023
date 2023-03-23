@@ -113,7 +113,7 @@ public void useState(TrapezoidProfile.State setpoint) {
 }
 
 public CommandBase setArmGoalCommand(double goal) {
-return Commands.runOnce(() -> setArmGoal(goal), this);
+return Commands.runOnce(() -> setArmGoal(goal));
 }
 
 public void set(double speed) {
@@ -133,7 +133,7 @@ public double getPositionRadians() {
 
 public CommandBase setArmManual(DoubleSupplier speed) {
 
-  return Commands.run(()->setArmGoal(getPositionRadians()+speed.getAsDouble()/2*Math.PI));
+  return Commands.run(()->setArmGoal(getPositionRadians()+speed.getAsDouble()/2*Math.PI),this);
 }
 
 public double getArmGoal() {

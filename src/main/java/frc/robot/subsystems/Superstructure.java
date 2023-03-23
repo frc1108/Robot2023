@@ -12,12 +12,12 @@ import frc.robot.Constants.ArmConstants;
 
 public class Superstructure extends SubsystemBase {
   private final ArmSubsystem m_arm;
-  private final SliderSubsystem m_slide;
+  private final ExtenderSubsystem m_slide;
   private final ElevatorSubsystem m_elevator;
   private final ClawSubsystem m_claw;
 
   /** Creates a new Superstructure. */
-  public Superstructure(ArmSubsystem arm, SliderSubsystem slide,
+  public Superstructure(ArmSubsystem arm, ExtenderSubsystem slide,
                         ElevatorSubsystem elevator, ClawSubsystem claw) {
   m_arm = arm;
   m_slide = slide;
@@ -35,13 +35,13 @@ public class Superstructure extends SubsystemBase {
       Commands.waitSeconds(0.5),
       m_arm.setArmGoalCommand(ArmConstants.kArmHighCubeOffsetRads),
       Commands.waitSeconds(0.25),
-      Commands.runOnce(()->m_slide.set(0.9),m_slide),
-      Commands.waitSeconds(0.75),
-      Commands.runOnce(()->m_slide.set(0), m_slide),
-      m_claw.releaseCommand(),
-      Commands.runOnce(()->m_slide.set(-0.9),m_slide),
-      Commands.waitSeconds(-0.75),
-      Commands.runOnce(()->m_slide.set(0),m_slide),
+      // Commands.runOnce(()->m_slide.set(0.9),m_slide),
+      // Commands.waitSeconds(0.75),
+      // Commands.runOnce(()->m_slide.set(0), m_slide),
+      // m_claw.releaseCommand(),
+      // Commands.runOnce(()->m_slide.set(-0.9),m_slide),
+      // Commands.waitSeconds(-0.75),
+      // Commands.runOnce(()->m_slide.set(0),m_slide),
       m_elevator.downCommand(),
       Commands.waitSeconds(0.1),
       m_arm.setArmGoalCommand(ArmConstants.kArmOffsetRads+Units.degreesToRadians(15))
