@@ -102,11 +102,11 @@ public class RobotContainer {
     //     ArmConstants.kArmDeadband))
     // );
 
-    m_arm.setDefaultCommand(
-      m_arm.setArmManual(()->-ArmConstants.kMaxArmSpeed*
-      MathUtil.applyDeadband(m_operatorController.getRightY(),
-      ArmConstants.kArmDeadband))
-    );
+    // m_arm.setDefaultCommand(
+    //   m_arm.setArmManual(()->-ArmConstants.kMaxArmSpeed*
+    //   MathUtil.applyDeadband(m_operatorController.getRightY(),
+    //   ArmConstants.kArmDeadband))
+    // );
           
   //   m_slider.setDefaultCommand(
   //     new RunCommand(
@@ -139,15 +139,17 @@ public class RobotContainer {
     //m_driverController.y().whileTrue(m_swerve.autoBalance());
 
     // Auto score testing
-    // m_driverController.x().onTrue(m_superStruct.scoreCubeAutoCommand());
+    m_driverController.x().onTrue(m_superStruct.scoreCubeAutoCommand());
 
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
-    m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
+    // m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
+    m_operatorController.y().onTrue(m_slider.setSliderGoalCommand(-Units.inchesToMeters(0.5)));
+    m_operatorController.b().onTrue(m_slider.setSliderGoalCommand(-Units.inchesToMeters(12)));
 
     // Move the arm to neutral position when the 'B' button is pressed.
-    m_operatorController
-        .b()
-        .onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(15) + Constants.ArmConstants.kArmOffsetRads));
+    // m_operatorController
+    //     .b()
+    //     .onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(15) + Constants.ArmConstants.kArmOffsetRads));
 
     // Elevator control on POV
     m_operatorController.povUp().onTrue(m_elevator.upCommand());

@@ -135,6 +135,7 @@ public CommandBase setArmManual(DoubleSupplier speed) {
   return Commands.run(()->setArmGoal(getPositionRadians()+speed.getAsDouble()/2*Math.PI),this);
 }
 
+@Log
 public double getArmGoal() {
   return m_goal;
 }

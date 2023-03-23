@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.SliderConstants;
 
 public class Superstructure extends SubsystemBase {
   private final ArmSubsystem m_arm;
@@ -35,13 +36,12 @@ public class Superstructure extends SubsystemBase {
       Commands.waitSeconds(0.5),
       m_arm.setArmGoalCommand(ArmConstants.kArmHighCubeOffsetRads),
       Commands.waitSeconds(0.25),
-      Commands.runOnce(()->m_slide.set(0.9),m_slide),
-      Commands.waitSeconds(0.75),
-      Commands.runOnce(()->m_slide.set(0), m_slide),
+      m_slide.setSliderGoalCommand(SliderConstants.kSliderHighCubeMeters),
+      Commands.waitSeconds(1),
       m_claw.releaseCommand(),
-      Commands.runOnce(()->m_slide.set(-0.9),m_slide),
-      Commands.waitSeconds(-0.75),
-      Commands.runOnce(()->m_slide.set(0),m_slide),
+      Commands.waitSeconds(0.1),
+      m_slide.setSliderGoalCommand(SliderConstants.kSliderStowMeters),
+      Commands.waitSeconds(1),
       m_elevator.downCommand(),
       Commands.waitSeconds(0.1),
       m_arm.setArmGoalCommand(ArmConstants.kArmOffsetRads+Units.degreesToRadians(15))

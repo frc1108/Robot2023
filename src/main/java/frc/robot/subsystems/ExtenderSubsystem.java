@@ -45,9 +45,9 @@ public class ExtenderSubsystem extends TrapezoidProfileSubsystem implements Logg
   public ExtenderSubsystem() {
     super(
         // The constraints for the generated profiles
-        new TrapezoidProfile.Constraints(0, 0),
-        // The initial position of the mechanism
-        0);
+        new TrapezoidProfile.Constraints(SliderConstants.kMaxVelocityMetersPerSecond, 
+        SliderConstants.kMaxAccelerationMetersPerSecSquared),
+    SliderConstants.kSliderOffsetMeters);
         
         m_motor.restoreFactoryDefaults();
 
@@ -81,6 +81,12 @@ public class ExtenderSubsystem extends TrapezoidProfileSubsystem implements Logg
   }
 
   @Override
+public void periodic(){
+  super.setGoal(m_goal);
+  super.periodic();
+}
+
+  @Override
   public void useState(TrapezoidProfile.State setpoint) {
     // Calculate the feedforward from the sepoint
     double feedforward = m_feedforward.calculate(setpoint.position,
@@ -101,6 +107,7 @@ public CommandBase setSliderManual(DoubleSupplier speed) {
   return Commands.run(()->setSliderGoal(getPositionMeters()+speed.getAsDouble()/12));
 }
 
+@Log
 public double getSliderGoal() {
   return m_goal;
 }
@@ -108,6 +115,10 @@ public double getSliderGoal() {
 public void setSliderGoal(double goal) {
   m_goal = goal;
 }
+
+public CommandBase setSliderGoalCommand(double goal) {
+  return Commands.runOnce(() -> setSliderGoal(goal));
+  }
 
 public void set(double speed) {
   m_motor.set(m_sliderSlew.calculate(speed));
