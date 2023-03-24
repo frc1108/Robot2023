@@ -69,6 +69,7 @@ m_motor.restoreFactoryDefaults();
 
 // Setup the encoder and pid controller
 m_encoder = m_motor.getEncoder();
+m_encoder.setPosition(ArmConstants.kArmOffsetRads);
 m_pid = m_motor.getPIDController();
 m_pid.setFeedbackDevice(m_encoder);
 
@@ -99,6 +100,12 @@ m_motor.burnFlash();
 public void periodic(){
   super.setGoal(m_goal);
   super.periodic();
+  if (isArmDown()) {
+    resetDownPosition();
+  }
+  if (isArmUp()) {
+    resetUpPosition();
+  }
 }
 
 @Override
@@ -108,7 +115,7 @@ public void useState(TrapezoidProfile.State setpoint) {
                                                setpoint.velocity);
   
   // Add the feedforward to the PID output to get the motor output
-  m_pid.setReference(setpoint.position - ArmConstants.kArmOffsetRads,
+  m_pid.setReference(setpoint.position, // - ArmConstants.kArmOffsetRads,
                      ControlType.kPosition, 0, feedforward);
 }
 
@@ -128,7 +135,7 @@ return Commands.runOnce(() -> setArmGoal(goal), this);
 
 @Log
 public double getPositionRadians() {
-  return m_encoder.getPosition() + ArmConstants.kArmOffsetRads;
+  return m_encoder.getPosition(); // + ArmConstants.kArmOffsetRads;
 }
 
 public CommandBase setArmManual(DoubleSupplier speed) {
@@ -142,12 +149,17 @@ public double getArmGoal() {
 
 public void setArmGoal(double goal) {
   
-  m_goal = MathUtil.clamp(goal,ArmConstants.kArmOffsetRads,ArmConstants.kArmMaxRads);
+  m_goal = MathUtil.clamp(goal,ArmConstants.kArmOffsetRads-0.1,ArmConstants.kArmMaxRads+0.1);
 }
 
-public void resetPosition() {
+public void resetDownPosition() {
   m_encoder.setPosition(ArmConstants.kArmOffsetRads);
   m_goal = ArmConstants.kArmOffsetRads;
+}
+
+public void resetUpPosition() {
+  m_encoder.setPosition(ArmConstants.kArmMaxRads);
+  m_goal = ArmConstants.kArmMaxRads;
 }
 
 @Log

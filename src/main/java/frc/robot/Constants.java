@@ -163,8 +163,8 @@ public final class Constants {
     public static final double kAVoltSecondSquaredPerRad = 0.030171;
     public static final double kMaxVelocityRadPerSecond = 5;
     public static final double kMaxAccelerationRadPerSecSquared = 8;
-    public static final double kArmOffsetRads = -1.3645; //Starting angle
-    public static final double kArmMaxRads = 4; //Ending angle
+    public static final double kArmOffsetRads = Units.degreesToRadians(-80); //Starting angle
+    public static final double kArmMaxRads = Units.degreesToRadians(180); //Ending angle
 
     public static final double kArmEncoderPositionFactor = ((2 * Math.PI) / kArmGearRatio); // radians
     public static final double kArmEncoderVelocityFactor = ((2 * Math.PI) / kArmGearRatio) / 60.0; // radians per second
@@ -214,8 +214,8 @@ public final class Constants {
     public static final double kSliderGearRatio = 20; 
     public static final double kSliderPinionPitchInches = 1.214; 
 
-    public static final double kArmEncoderPositionFactor = Units.inchesToMeters(Math.PI*kSliderPinionPitchInches / kSliderGearRatio); // meters
-    public static final double kArmEncoderVelocityFactor = Units.inchesToMeters(Math.PI*kSliderPinionPitchInches / kSliderGearRatio) / 60.0; // meters per second
+    public static final double kSliderEncoderPositionFactor = Units.inchesToMeters(Math.PI*kSliderPinionPitchInches / kSliderGearRatio); // meters
+    public static final double kSliderEncoderVelocityFactor = Units.inchesToMeters(Math.PI*kSliderPinionPitchInches / kSliderGearRatio) / 60.0; // meters per second
 
     // public static final double kArmEncoderPositionPIDMinInput = kArmOffsetRads; // radians
     // public static final double kArmEncoderPositionPIDMaxInput = (1.5 * Math.PI); // Guess 

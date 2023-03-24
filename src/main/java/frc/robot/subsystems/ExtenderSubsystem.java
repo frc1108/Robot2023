@@ -62,8 +62,8 @@ public class ExtenderSubsystem extends TrapezoidProfileSubsystem implements Logg
         // are natively in rotations and RPM, however, we want these 
         // in radians and radians per second to use with the Spark Max PID
         // and WPILib ArmFeedforward APIs .
-        m_encoder.setPositionConversionFactor(SliderConstants.kArmEncoderPositionFactor);
-        m_encoder.setVelocityConversionFactor(SliderConstants.kArmEncoderVelocityFactor);
+        m_encoder.setPositionConversionFactor(SliderConstants.kSliderEncoderPositionFactor);
+        m_encoder.setVelocityConversionFactor(SliderConstants.kSliderEncoderVelocityFactor);
         
         // Set the PID values for the turning motor.
         m_pid.setP(SliderConstants.kP);
