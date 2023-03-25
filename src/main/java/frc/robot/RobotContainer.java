@@ -48,9 +48,9 @@ public class RobotContainer {
   // @Log private final SliderSubsystem m_slider = new SliderSubsystem();
    @Log private final ExtenderSubsystem m_slider = new ExtenderSubsystem();
   @Log private final VisionSubsystem m_vision = new VisionSubsystem();
-   @Log private final Superstructure m_superStruct = new Superstructure(m_arm, m_slider, m_elevator, m_claw);
+   @Log private final Superstructure m_superS = new Superstructure(m_arm, m_slider, m_elevator, m_claw);
 
-  private final Autos autos = new Autos(m_swerve);
+  private final Autos autos = new Autos(m_swerve, m_superS);
   private final LEDSubsystem m_leds = new LEDSubsystem();
 
   // The driver's controller
@@ -76,10 +76,13 @@ public class RobotContainer {
                                          .withWidget(BuiltInWidgets.kNumberSlider)
                                          .withProperties((Map.of("Min", 0, "Max", 10, "Block increment", 1)))
                                          .getEntry();
-    autoChooser.setDefaultOption("Nothing", Commands.waitSeconds(5));
-    autoChooser.addOption("Example Path", autos.example());
+    autoChooser.setDefaultOption("Nothing", Commands.none());
+    //autoChooser.addOption("Example Path", autos.example());
+    autoChooser.addOption("CubeBalance", autos.cubeBB());
+    autoChooser.addOption("SpeedBump",autos.speedBump());
     autoChooser.addOption("AutoBalance",m_swerve.autoBalance());
-    autoChooser.addOption("High Cube",m_superStruct.scoreCubeAutoCommand());
+    autoChooser.addOption("High Cube",m_superS.scoreCubeAutoCommand());
+    autoChooser.addOption("Center Cube", autos.cubeCenter());
     SmartDashboard.putData("Auto Chooser",autoChooser);
 
     // Configure default commands
@@ -140,7 +143,7 @@ public class RobotContainer {
     //m_driverController.y().whileTrue(m_swerve.autoBalance());
 
     // Auto score testing
-    m_driverController.x().onTrue(m_superStruct.scoreCubeAutoCommand());
+    //m_driverController.x().onTrue(m_superS.scoreCubeAutoCommand());
 
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
     m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));

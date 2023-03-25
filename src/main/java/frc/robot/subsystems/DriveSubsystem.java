@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -71,8 +72,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      }
-      //,new Pose2d(new Translation2d(),new Rotation2d(Units.degreesToRadians(180)))
+      },
+      new Pose2d(new Translation2d(),new Rotation2d(Units.degreesToRadians(180)))
   );
 
   /** Creates a new DriveSubsystem. */

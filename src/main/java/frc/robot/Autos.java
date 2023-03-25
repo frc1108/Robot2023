@@ -24,17 +24,20 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Superstructure;
 
 @SuppressWarnings("unused")
 public final class Autos {
 
   private final DriveSubsystem m_swerve;
+  private final Superstructure m_superS;
   private final SendableChooser<Command> autoChooser;
-  private final HashMap<String, Command> eventMap;
+  private HashMap<String, Command> eventMap;
   private final SwerveAutoBuilder autoBuilder;
   
-  public Autos(DriveSubsystem swerve) {
+  public Autos(DriveSubsystem swerve,Superstructure superS) {
     this.m_swerve = swerve;
+    this.m_superS = superS;
 
     eventMap = new HashMap<>();
     setMarkers();
@@ -56,7 +59,9 @@ public final class Autos {
     SmartDashboard.putData("Auto Chooser",autoChooser);
   }
 
-  private void setMarkers() {}
+  private void setMarkers() {
+    eventMap = buildEventMap();
+  }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -75,11 +80,27 @@ public final class Autos {
       return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Example Path",
                                   new PathConstraints(4, 3)));
     }
+    public CommandBase cubeBB() {
+      return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Cube Balance",
+                                  new PathConstraints(4, 3)));
+    }
+    
+    public CommandBase speedBump() {
+      return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Speedbump",
+      new PathConstraints(4, 3)));      
+    }
+
+    public CommandBase cubeCenter() {
+      return m_superS.scoreCubeAutoCommand().andThen(m_swerve.autoBalance());
+    }
   
     private HashMap<String, Command> buildEventMap() {
       return new HashMap<>(
           Map.ofEntries(
-              Map.entry("event1", Commands.print("event1")),
-              Map.entry("event2", Commands.print("event2"))));
+              //Map.entry("scoreCubeHigh", m_superS.scoreCubeAutoCommand().alongWith(Commands.print("Cube Score"))),
+              Map.entry("scoreCubeHigh", Commands.print("Cube Score")),
+              //Commands.print("Cube Score")),
+              Map.entry("autoBalance", m_swerve.autoBalance())));
+              // Commands.print("Auto Balance"))));
     }
   }
