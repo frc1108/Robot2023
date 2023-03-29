@@ -13,6 +13,9 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import com.pathplanner.lib.PathConstraints;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,9 +34,12 @@ public final class Autos {
 
   private final DriveSubsystem m_swerve;
   private final Superstructure m_superS;
-  private final SendableChooser<Command> autoChooser;
   private HashMap<String, Command> eventMap;
   private final SwerveAutoBuilder autoBuilder;
+
+  // Autonomous selector on dashboard
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+  private GenericEntry kAutoStartDelaySeconds;
   
   public Autos(DriveSubsystem swerve,Superstructure superS) {
     this.m_swerve = swerve;
@@ -53,8 +59,19 @@ public final class Autos {
         eventMap,
         m_swerve);
 
-    autoChooser = new SendableChooser<Command>();
-    autoChooser.setDefaultOption("None", none());
+    // Autonomous selector options
+    kAutoStartDelaySeconds = Shuffleboard.getTab("Live")
+                                         .add("Auto Delay", 0)
+                                         .withWidget(BuiltInWidgets.kNumberSlider)
+                                         .withProperties((Map.of("Min", 0, "Max", 10, "Block increment", 1)))
+                                         .getEntry();
+    
+    autoChooser.setDefaultOption("Nothing", Commands.none());
+    autoChooser.addOption("CubeBalance", cubeBB());
+    autoChooser.addOption("SpeedBump",speedBump());
+    autoChooser.addOption("AutoBalance",m_swerve.autoBalance());
+    autoChooser.addOption("High Cube",m_superS.scoreCubeAutoCommand());
+    autoChooser.addOption("Center Cube", cubeCenter());
 
     SmartDashboard.putData("Auto Chooser",autoChooser);
   }
@@ -63,15 +80,6 @@ public final class Autos {
     eventMap = buildEventMap();
   }
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-      return autoChooser.getSelected();
-    }
-  
     public CommandBase none() {
       return Commands.none();
     }
@@ -97,10 +105,25 @@ public final class Autos {
     private HashMap<String, Command> buildEventMap() {
       return new HashMap<>(
           Map.ofEntries(
-              //Map.entry("scoreCubeHigh", m_superS.scoreCubeAutoCommand().alongWith(Commands.print("Cube Score"))),
-              Map.entry("scoreCubeHigh", Commands.print("Cube Score")),
+              Map.entry("scoreCubeHigh", m_superS.scoreCubeAutoCommand().alongWith(Commands.print("Cube Score"))),
+              //Map.entry("scoreCubeHigh", Commands.print("Cube Score")),
               //Commands.print("Cube Score")),
               Map.entry("autoBalance", m_swerve.autoBalance())));
               // Commands.print("Auto Balance"))));
     }
+
+      /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return Commands.sequence(
+      Commands.waitSeconds(kAutoStartDelaySeconds.getDouble(0)),
+      autoChooser.getSelected());
+  }
+
+  public void resetAutoHeading() {
+    m_swerve.zeroHeading();
+  }
   }

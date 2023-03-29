@@ -50,7 +50,7 @@ public class RobotContainer {
   @Log private final VisionSubsystem m_vision = new VisionSubsystem();
    @Log private final Superstructure m_superS = new Superstructure(m_arm, m_slider, m_elevator, m_claw);
 
-  private final Autos autos = new Autos(m_swerve, m_superS);
+  private final Autos m_autos = new Autos(m_swerve, m_superS);
   private final LEDSubsystem m_leds = new LEDSubsystem();
 
   // The driver's controller
@@ -59,31 +59,14 @@ public class RobotContainer {
   CommandXboxController m_operatorController = new CommandXboxController(
                                              OIConstants.kOperatorControllerPort);
 
-  // Autonomous selector on dashboard
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-  private GenericEntry kAutoStartDelaySeconds;
- 
-  /**
+   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
 
-    // Autonomous selector options
-    kAutoStartDelaySeconds = Shuffleboard.getTab("Live")
-                                         .add("Auto Delay", 0)
-                                         .withWidget(BuiltInWidgets.kNumberSlider)
-                                         .withProperties((Map.of("Min", 0, "Max", 10, "Block increment", 1)))
-                                         .getEntry();
-    autoChooser.setDefaultOption("Nothing", Commands.none());
-    //autoChooser.addOption("Example Path", autos.example());
-    autoChooser.addOption("CubeBalance", autos.cubeBB());
-    autoChooser.addOption("SpeedBump",autos.speedBump());
-    autoChooser.addOption("AutoBalance",m_swerve.autoBalance());
-    autoChooser.addOption("High Cube",m_superS.scoreCubeAutoCommand());
-    autoChooser.addOption("Center Cube", autos.cubeCenter());
-    SmartDashboard.putData("Auto Chooser",autoChooser);
+    
 
     // Configure default commands
     m_swerve.setDefaultCommand(
@@ -94,11 +77,11 @@ public class RobotContainer {
           -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
           true, true),m_swerve));
     
-    // m_arm.setDefaultCommand(
-    //   new RunCommand(
-    //     () -> m_arm.set(-ArmConstants.kMaxArmSpeed*
-    //       MathUtil.applyDeadband(m_operatorController.getRightY(),
-    //       ArmConstants.kArmDeadband)),m_arm));
+    m_arm.setDefaultCommand(
+      new RunCommand(
+        () -> m_arm.set(-ArmConstants.kMaxArmSpeed*
+          MathUtil.applyDeadband(m_operatorController.getRightY(),
+          ArmConstants.kArmDeadband)),m_arm));
 
     // m_arm.setDefaultCommand(
     //   m_arm.manualArmOrHold(-ArmConstants.kMaxArmSpeed*
@@ -106,17 +89,25 @@ public class RobotContainer {
     //     ArmConstants.kArmDeadband))
     // );
 
-    m_arm.setDefaultCommand(
-      m_arm.setArmManual(()->-ArmConstants.kMaxArmSpeed*
-      MathUtil.applyDeadband(m_operatorController.getRightY(),
-      ArmConstants.kArmDeadband))
-    );
+    // m_arm.setDefaultCommand(
+    //   m_arm.setArmManual(()->-ArmConstants.kMaxArmSpeed*
+    //   MathUtil.applyDeadband(m_operatorController.getRightY(),
+    //   ArmConstants.kArmDeadband))
+    // );
           
-    m_slider.setDefaultCommand(
-      m_slider.setSliderManual(()->SliderConstants.kMaxSliderSpeed*
+    // m_slider.setDefaultCommand(
+    //   m_slider.setSliderManual(()->SliderConstants.kMaxSliderSpeed*
+    //       MathUtil.applyDeadband(m_operatorController.getLeftY(),
+    //       SliderConstants.kSliderDeadband))
+    // );
+
+        m_slider.setDefaultCommand(
+          new RunCommand(()->m_slider.set(
+            SliderConstants.kMaxSliderSpeed*
           MathUtil.applyDeadband(m_operatorController.getLeftY(),
-          SliderConstants.kSliderDeadband))
-    );
+          SliderConstants.kSliderDeadband)),m_slider
+    ));
+
   }
 
   /**
@@ -172,17 +163,24 @@ public class RobotContainer {
   }
 
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
+   * 
+   * @return Autos class for Robot heading reset and auto commands
    */
-  public Command getAutonomousCommand() {
-    return Commands.sequence(
-      Commands.waitSeconds(kAutoStartDelaySeconds.getDouble(0)),
-      autoChooser.getSelected());
+  public Autos getAutos() {
+    return m_autos;
   }
-
-  public void resetAutoHeading() {
-    m_swerve.zeroHeading();
+  /**
+   * 
+   * @return Autos class for Robot heading reset and auto commands
+   */
+  public ArmSubsystem getArm() {
+    return m_arm;
+  }
+  /**
+   * 
+   * @return Autos class for Robot heading reset and auto commands
+   */
+  public ExtenderSubsystem getSlider() {
+    return m_slider;
   }
 }

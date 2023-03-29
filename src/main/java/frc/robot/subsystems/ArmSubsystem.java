@@ -123,9 +123,9 @@ public CommandBase setArmGoalCommand(double goal) {
 return Commands.runOnce(() -> setArmGoal(goal), this);
 }
 
-// public void set(double speed) {
-//   m_motor.set(m_armSlew.calculate(speed));
-// }
+public void set(double speed) {
+  m_motor.set(m_armSlew.calculate(speed));
+}
 
 // public CommandBase manualArmOrHold(double speed) {
 //   return Commands.either(setArmGoalCommand(getPositionRadians()).withName("auto arm"),

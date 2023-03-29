@@ -60,8 +60,10 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    m_robotContainer.resetAutoHeading();
+    m_autonomousCommand = m_robotContainer.getAutos().getAutonomousCommand();
+    m_robotContainer.getArm().enable();
+    m_robotContainer.getSlider().enable();
+    m_robotContainer.getAutos().resetAutoHeading();
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
      * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
@@ -88,6 +90,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.getArm().disable();
+    m_robotContainer.getSlider().disable();
   }
 
   /** This function is called periodically during operator control. */
