@@ -238,7 +238,7 @@ public final class Constants {
     public static final double kMaxArmSpeed = 0.4;
     public static final double kArmSlewRate = 2;
     public static final double kArmDeadband = 0.06;
-    public static final double kSliderHighCubeMeters = Units.inchesToMeters(-12);
+    public static final double kSliderHighCubeMeters = Units.inchesToMeters(-12.5);
     public static final double kSliderStowMeters = Units.inchesToMeters(0);
 
   }

@@ -172,6 +172,10 @@ public boolean isArmUp() {
   return m_motor.getForwardLimitSwitch(Type.kNormallyOpen).isPressed();
 }
 
+public void setEncoderPosition(double position) {
+  m_encoder.setPosition(position);
+}
+
 
 
 }

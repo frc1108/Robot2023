@@ -8,6 +8,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -62,6 +63,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
   private SlewRateLimiter m_magLimiter = new SlewRateLimiter(DriveConstants.kMagnitudeSlewRate);
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
+
+  private MedianFilter m_filterX = new MedianFilter(5);
+  private MedianFilter m_filterY = new MedianFilter(5);
   
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -260,6 +264,14 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
   @Log
   public double getRobotPitch() {
     return m_gyro.getXComplementaryAngle();
+
+  }
+  @Log
+  public double getPitch() {
+    return Math.sqrt(
+             Math.pow(m_filterX.calculate(m_gyro.getXComplementaryAngle()),2)+
+             Math.pow(m_filterY.calculate(m_gyro.getYComplementaryAngle()),2)
+           );
   }
 
   public CommandBase autoBalance() {
@@ -270,12 +282,29 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
                           0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())>=14.3),
           Commands.run(
             ()->this.drive(0.3/DriveConstants.kMaxSpeedMetersPerSecond,
-                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=12.5),
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=9),
           Commands.run(this::setX,this)),
         Commands.waitSeconds(15));
       // Commands.run(
       //   ()->this.drive(0,0,0,true,true),this));
   }
+  
+  public CommandBase autoBalanceBackwards() {
+    return Commands.race(
+        Commands.sequence(
+          Commands.run(
+            ()->this.drive(-2/DriveConstants.kMaxSpeedMetersPerSecond,
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())>=14.3),
+          Commands.run(
+            ()->this.drive(-0.3/DriveConstants.kMaxSpeedMetersPerSecond,
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=9),
+          Commands.run(this::setX,this)),
+        Commands.waitSeconds(15));
+      // Commands.run(
+      //   ()->this.drive(0,0,0,true,true),this));
+  }
+
+
 
   // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
 public CommandBase followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {

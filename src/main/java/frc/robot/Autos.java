@@ -71,7 +71,8 @@ public final class Autos {
     autoChooser.addOption("SpeedBump",speedBump());
     autoChooser.addOption("AutoBalance",m_swerve.autoBalance());
     autoChooser.addOption("High Cube",m_superS.scoreCubeAutoCommand());
-    autoChooser.addOption("Center Cube", cubeCenter());
+    // autoChooser.addOption("Center Cube", cubeCenter());
+    autoChooser.addOption("Center Cube Back", cubeCenterBackwards());
 
     SmartDashboard.putData("Auto Chooser",autoChooser);
   }
@@ -88,6 +89,7 @@ public final class Autos {
       return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Example Path",
                                   new PathConstraints(4, 3)));
     }
+
     public CommandBase cubeBB() {
       return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Cube Balance",
                                   new PathConstraints(4, 3)));
@@ -100,6 +102,10 @@ public final class Autos {
 
     public CommandBase cubeCenter() {
       return m_superS.scoreCubeAutoCommand().andThen(m_swerve.autoBalance());
+    }
+    
+    public CommandBase cubeCenterBackwards() {
+      return m_superS.scoreCubeAutoCommand().andThen(m_swerve.autoBalanceBackwards());
     }
   
     private HashMap<String, Command> buildEventMap() {

@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
+import frc.robot.Constants.ArmConstants;
 import io.github.oblarg.oblog.Logger;
 
 /**
@@ -64,6 +64,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.getArm().enable();
     m_robotContainer.getSlider().enable();
     m_robotContainer.getAutos().resetAutoHeading();
+    m_robotContainer.getArm().setEncoderPosition(ArmConstants.kArmOffsetRads);
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
      * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
