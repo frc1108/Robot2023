@@ -57,6 +57,7 @@ public final class Autos {
         new PIDConstants(AutoConstants.kPThetaController, 0, 0),
         m_swerve::setModuleStates,
         eventMap,
+        true,
         m_swerve);
 
     // Autonomous selector options
@@ -67,12 +68,16 @@ public final class Autos {
                                          .getEntry();
     
     autoChooser.setDefaultOption("Nothing", Commands.none());
+    autoChooser.addOption("StraightTurn", driveTurn());
+    autoChooser.addOption("StraightTurnSpeedBump", driveTurnSpeedBump());
     autoChooser.addOption("CubeBalance", cubeBB());
     autoChooser.addOption("SpeedBump",speedBump());
+    autoChooser.addOption("BigSpeedBump",bigSpeedBump());
+    autoChooser.addOption("Center Cube Back", cubeCenterBackwards());
     autoChooser.addOption("AutoBalance",m_swerve.autoBalance());
     autoChooser.addOption("High Cube",m_superS.scoreCubeAutoCommand());
     // autoChooser.addOption("Center Cube", cubeCenter());
-    autoChooser.addOption("Center Cube Back", cubeCenterBackwards());
+
 
     SmartDashboard.putData("Auto Chooser",autoChooser);
   }
@@ -85,10 +90,10 @@ public final class Autos {
       return Commands.none();
     }
   
-    public CommandBase example() {
-      return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Example Path",
-                                  new PathConstraints(4, 3)));
-    }
+    // public CommandBase example() {
+    //   return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Example Path",
+    //                               new PathConstraints(4, 3)));
+    // }
 
     public CommandBase cubeBB() {
       return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Cube Balance",
@@ -98,6 +103,21 @@ public final class Autos {
     public CommandBase speedBump() {
       return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Speedbump",
       new PathConstraints(4, 3)));      
+    }
+
+    public CommandBase driveTurn() {
+      return autoBuilder.fullAuto(PathPlanner.loadPathGroup("StraightTurn",
+      new PathConstraints(3, 2)));      
+    }
+
+    public CommandBase driveTurnSpeedBump() {
+      return autoBuilder.fullAuto(PathPlanner.loadPathGroup("StraightTurnSpeedBump",
+      new PathConstraints(4, 3)));      
+    }
+
+    public CommandBase bigSpeedBump() {
+      return autoBuilder.fullAuto(PathPlanner.loadPathGroup("BigSpeedBump",
+      new PathConstraints(0.8, 2)));      
     }
 
     public CommandBase cubeCenter() {

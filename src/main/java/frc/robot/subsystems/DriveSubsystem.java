@@ -279,12 +279,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
         Commands.sequence(
           Commands.run(
             ()->this.drive(2/DriveConstants.kMaxSpeedMetersPerSecond,
-                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())>=14.3),
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())>=14.8),
           Commands.run(
-            ()->this.drive(0.3/DriveConstants.kMaxSpeedMetersPerSecond,
-                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=9),
+            ()->this.drive(0.65/DriveConstants.kMaxSpeedMetersPerSecond,
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=9.5),
           Commands.run(this::setX,this)),
-        Commands.waitSeconds(15));
+        Commands.waitSeconds(14)).andThen(Commands.run(this::setX,this));
       // Commands.run(
       //   ()->this.drive(0,0,0,true,true),this));
   }
@@ -294,10 +294,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
         Commands.sequence(
           Commands.run(
             ()->this.drive(-2/DriveConstants.kMaxSpeedMetersPerSecond,
-                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())>=14.3),
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())>=14.8),
           Commands.run(
-            ()->this.drive(-0.3/DriveConstants.kMaxSpeedMetersPerSecond,
-                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=9),
+            ()->this.drive(-0.65/DriveConstants.kMaxSpeedMetersPerSecond,
+                          0,0,true,true),this).until(()->Math.abs(this.getRobotPitch())<=9.5),
           Commands.run(this::setX,this)),
         Commands.waitSeconds(15));
       // Commands.run(
