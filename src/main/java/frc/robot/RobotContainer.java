@@ -20,8 +20,9 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ExtenderSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.subsystems.SliderSubsystem;
+// import frc.robot.subsystems.SliderSubsystem;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.VisionSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
@@ -44,11 +45,12 @@ public class RobotContainer {
   @Log private final ArmSubsystem m_arm = new ArmSubsystem();
   @Log private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   @Log private final ClawSubsystem m_claw = new ClawSubsystem();
-  @Log private final SliderSubsystem m_slider = new SliderSubsystem();
+  // @Log private final SliderSubsystem m_slider = new SliderSubsystem();
+   @Log private final ExtenderSubsystem m_slider = new ExtenderSubsystem();
   @Log private final VisionSubsystem m_vision = new VisionSubsystem();
-  @Log private final Superstructure m_superStruct = new Superstructure(m_arm, m_slider, m_elevator, m_claw);
+   @Log private final Superstructure m_superS = new Superstructure(m_arm, m_slider, m_elevator, m_claw);
 
-  private final Autos autos = new Autos(m_swerve);
+  private final Autos m_autos = new Autos(m_swerve, m_superS);
   private final LEDSubsystem m_leds = new LEDSubsystem();
 
   // The driver's controller
@@ -57,27 +59,14 @@ public class RobotContainer {
   CommandXboxController m_operatorController = new CommandXboxController(
                                              OIConstants.kOperatorControllerPort);
 
-  // Autonomous selector on dashboard
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-  private GenericEntry kAutoStartDelaySeconds;
- 
-  /**
+   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
 
-    // Autonomous selector options
-    kAutoStartDelaySeconds = Shuffleboard.getTab("Live")
-                                         .add("Auto Delay", 0)
-                                         .withWidget(BuiltInWidgets.kNumberSlider)
-                                         .withProperties((Map.of("Min", 0, "Max", 10, "Block increment", 1)))
-                                         .getEntry();
-    autoChooser.setDefaultOption("Nothing", Commands.waitSeconds(5));
-    autoChooser.addOption("Example Path", autos.example());
-    autoChooser.addOption("AutoBalance",m_swerve.autoBalance());
-    SmartDashboard.putData("Auto Chooser",autoChooser);
+    
 
     // Configure default commands
     m_swerve.setDefaultCommand(
@@ -99,12 +88,26 @@ public class RobotContainer {
     //     MathUtil.applyDeadband(m_operatorController.getRightY(),
     //     ArmConstants.kArmDeadband))
     // );
+
+    // m_arm.setDefaultCommand(
+    //   m_arm.setArmManual(()->-ArmConstants.kMaxArmSpeed*
+    //   MathUtil.applyDeadband(m_operatorController.getRightY(),
+    //   ArmConstants.kArmDeadband))
+    // );
           
-    m_slider.setDefaultCommand(
-      new RunCommand(
-        () -> m_slider.set(SliderConstants.kMaxSliderSpeed*
+    // m_slider.setDefaultCommand(
+    //   m_slider.setSliderManual(()->SliderConstants.kMaxSliderSpeed*
+    //       MathUtil.applyDeadband(m_operatorController.getLeftY(),
+    //       SliderConstants.kSliderDeadband))
+    // );
+
+        m_slider.setDefaultCommand(
+          new RunCommand(()->m_slider.set(
+            SliderConstants.kMaxSliderSpeed*
           MathUtil.applyDeadband(m_operatorController.getLeftY(),
-          SliderConstants.kSliderDeadband)),m_slider));
+          SliderConstants.kSliderDeadband)),m_slider
+    ));
+
   }
 
   /**
@@ -122,19 +125,21 @@ public class RobotContainer {
     m_driverController.rightBumper().whileTrue(Commands.run(m_swerve::setX));
 
     // Reset gyro when A button is pressed 
-    m_driverController.a().onTrue(Commands.runOnce(()->m_swerve.zeroHeading()));
+    m_driverController.a().onTrue(Commands.runOnce(m_swerve::zeroHeading));
 
     // Go through LED Patterns on driver button
-    m_driverController.b().onTrue(Commands.runOnce(()->m_leds.nextPattern(),m_leds));
+    m_driverController.b().onTrue(Commands.runOnce(m_leds::nextPattern,m_leds));
 
     // Autobalance testing
-    // m_driverController.y().whileTrue(m_swerve.autoBalance());
+    //m_driverController.y().whileTrue(m_swerve.autoBalance());
 
     // Auto score testing
-    // m_driverController.x().whileTrue(m_superStruct.scoreCubeAutoCommand());
+    //m_driverController.x().onTrue(m_superS.scoreCubeAutoCommand());
 
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
-    // m_operatorController.a().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
+    m_operatorController.y().onTrue(m_arm.setArmGoalCommand(Units.degreesToRadians(30)));
+    // m_operatorController.y().onTrue(m_slider.setSliderGoalCommand(-Units.inchesToMeters(0.5)));
+    m_operatorController.b().onTrue(m_slider.setSliderGoalCommand(-Units.inchesToMeters(12)));
 
     // Move the arm to neutral position when the 'B' button is pressed.
     // m_operatorController
@@ -158,17 +163,24 @@ public class RobotContainer {
   }
 
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
+   * 
+   * @return Autos class for Robot heading reset and auto commands
    */
-  public Command getAutonomousCommand() {
-    return Commands.sequence(
-      Commands.waitSeconds(kAutoStartDelaySeconds.getDouble(0)),
-      autoChooser.getSelected());
+  public Autos getAutos() {
+    return m_autos;
   }
-
-  public void resetAutoHeading() {
-    m_swerve.zeroHeading();
+  /**
+   * 
+   * @return Autos class for Robot heading reset and auto commands
+   */
+  public ArmSubsystem getArm() {
+    return m_arm;
+  }
+  /**
+   * 
+   * @return Autos class for Robot heading reset and auto commands
+   */
+  public ExtenderSubsystem getSlider() {
+    return m_slider;
   }
 }

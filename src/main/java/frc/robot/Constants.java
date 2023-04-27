@@ -27,8 +27,8 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
-    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    public static final double kMaxSpeedMetersPerSecond = 4.8 / 2;
+    public static final double kMaxAngularSpeed = 2 * Math.PI / 2; // radians per second
 
     public static final double kDirectionSlewRate = 1.2; // radians per second
     public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
@@ -163,7 +163,8 @@ public final class Constants {
     public static final double kAVoltSecondSquaredPerRad = 0.030171;
     public static final double kMaxVelocityRadPerSecond = 5;
     public static final double kMaxAccelerationRadPerSecSquared = 8;
-    public static final double kArmOffsetRads = -1.3645; //Starting angle
+    public static final double kArmOffsetRads = Units.degreesToRadians(-80); //Starting angle
+    public static final double kArmMaxRads = Units.degreesToRadians(180); //Ending angle
 
     public static final double kArmEncoderPositionFactor = ((2 * Math.PI) / kArmGearRatio); // radians
     public static final double kArmEncoderVelocityFactor = ((2 * Math.PI) / kArmGearRatio) / 60.0; // radians per second
@@ -189,18 +190,57 @@ public final class Constants {
     public static final double kMaxArmRadiansPerSecond =
       Units.rotationsPerMinuteToRadiansPerSecond(kMaxArmSpeedRpm);
 
-    public static final double kMaxArmSpeed = 0.4;
+    public static final double kMaxArmSpeed = 0.5 / 1.25;
     public static final double kArmSlewRate = 2;
-    public static final double kArmDeadband = 0.06;
+    public static final double kArmDeadband = 0.1;
 
     public static final double kArmHighCubeOffsetRads = Units.degreesToRadians(5);
   }
 
   public static final class SliderConstants {
     public static final int kSliderMotorCurrentLimit = 20;
-    public static final double kSliderDeadband = 0.06;
+    public static final double kSliderDeadband = 0.1;
     public static final double kSliderSlewRate = 2;
-    public static final double kMaxSliderSpeed = 0.95;
+    public static final double kMaxSliderSpeed = 0.75;
+
+    public static final double kSVolts = 0.26164;
+    public static final double kVVoltSecondPerMeters = 1.3196; //13.196
+    public static final double kAVoltSecondSquaredPerMeters = 0.19577;
+
+    public static final double kMaxVelocityMetersPerSecond = 0.75;
+    public static final double kMaxAccelerationMetersPerSecSquared = 1.5;
+    public static final double kSliderOffsetMeters = 0; //Starting position
+    public static final double kSliderMaxMeters = Units.inchesToMeters(-15); //Ending position
+    public static final double kSliderGearRatio = 20; 
+    public static final double kSliderPinionPitchInches = 1.214; 
+
+    public static final double kSliderEncoderPositionFactor = Units.inchesToMeters(Math.PI*kSliderPinionPitchInches / kSliderGearRatio); // meters
+    public static final double kSliderEncoderVelocityFactor = Units.inchesToMeters(Math.PI*kSliderPinionPitchInches / kSliderGearRatio) / 60.0; // meters per second
+
+    // public static final double kArmEncoderPositionPIDMinInput = kArmOffsetRads; // radians
+    // public static final double kArmEncoderPositionPIDMaxInput = (1.5 * Math.PI); // Guess 
+
+    public static final int kArmMotorCurrentLimit = 40; // amps
+    public static final double kP = 4; //10000x
+    public static final double kPVel = 5.534E-11;
+    public static final double kI = 0;
+    public static final double kD = 0.2;
+    public static final double kDVel = 0;
+    public static final double kFF = 0;
+    public static final double kMinOutput = -1;
+    public static final double kMaxOutput = 1;
+  
+    // public static final double kMaxArmSpeedRpm = 
+    //   NeoMotorConstants.kFreeSpeedRpm / kSliderGearRatio ;
+    // public static final double kMaxArmRadiansPerSecond =
+    //   Units.rotationsPerMinuteToRadiansPerSecond(kMaxArmSpeedRpm);
+
+    public static final double kMaxArmSpeed = 0.4;
+    public static final double kArmSlewRate = 2;
+    public static final double kArmDeadband = 0.06;
+    public static final double kSliderHighCubeMeters = Units.inchesToMeters(-12.5);
+    public static final double kSliderStowMeters = Units.inchesToMeters(0);
+
   }
 
   public static final class REVPHConstants {
