@@ -9,15 +9,16 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.SliderConstants;
 
 public class Superstructure extends SubsystemBase {
   private final ArmSubsystem m_arm;
-  private final SliderSubsystem m_slide;
+  private final ExtenderSubsystem m_slide;
   private final ElevatorSubsystem m_elevator;
   private final ClawSubsystem m_claw;
 
   /** Creates a new Superstructure. */
-  public Superstructure(ArmSubsystem arm, SliderSubsystem slide,
+  public Superstructure(ArmSubsystem arm, ExtenderSubsystem slide,
                         ElevatorSubsystem elevator, ClawSubsystem claw) {
   m_arm = arm;
   m_slide = slide;
@@ -30,18 +31,17 @@ public class Superstructure extends SubsystemBase {
     return Commands.sequence(
       Commands.print("Score auto cube"),
       m_claw.gripCommand(),
-      Commands.waitSeconds(0.1),
+      Commands.waitSeconds(0.25),
       m_elevator.upCommand(),
-      Commands.waitSeconds(0.25),
+      Commands.waitSeconds(1.35),
       m_arm.setArmGoalCommand(ArmConstants.kArmHighCubeOffsetRads),
-      Commands.waitSeconds(0.25),
-      Commands.runOnce(()->m_slide.set(0.9),m_slide),
-      Commands.waitSeconds(0.75),
-      Commands.runOnce(()->m_slide.set(0), m_slide),
+      Commands.waitSeconds(0.3),
+      m_slide.setSliderGoalCommand(SliderConstants.kSliderHighCubeMeters),
+      Commands.waitSeconds(1),
       m_claw.releaseCommand(),
-      Commands.runOnce(()->m_slide.set(-0.9),m_slide),
-      Commands.waitSeconds(-0.75),
-      Commands.runOnce(()->m_slide.set(0),m_slide),
+      Commands.waitSeconds(0.1),
+      m_slide.setSliderGoalCommand(SliderConstants.kSliderStowMeters),
+      Commands.waitSeconds(1),
       m_elevator.downCommand(),
       Commands.waitSeconds(0.1),
       m_arm.setArmGoalCommand(ArmConstants.kArmOffsetRads+Units.degreesToRadians(15))

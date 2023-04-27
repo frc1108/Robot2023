@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -12,11 +14,11 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants.ArmConstants;
@@ -53,6 +55,8 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem implements Loggable{
 
   private final SlewRateLimiter m_armSlew = new SlewRateLimiter(ArmConstants.kArmSlewRate);
 
+  private double m_goal = ArmConstants.kArmOffsetRads;
+
 /** Create a new ArmSubsystem. */
 public ArmSubsystem() {
 super(
@@ -65,6 +69,7 @@ m_motor.restoreFactoryDefaults();
 
 // Setup the encoder and pid controller
 m_encoder = m_motor.getEncoder();
+m_encoder.setPosition(ArmConstants.kArmOffsetRads);
 m_pid = m_motor.getPIDController();
 m_pid.setFeedbackDevice(m_encoder);
 
@@ -92,8 +97,15 @@ m_motor.burnFlash();
 }
 
 @Override
-public void periodic() {
-  
+public void periodic(){
+  super.setGoal(m_goal);
+  super.periodic();
+  if (isArmDown()) {
+    resetDownPosition();
+  }
+  if (isArmUp()) {
+    resetUpPosition();
+  }
 }
 
 @Override
@@ -103,37 +115,67 @@ public void useState(TrapezoidProfile.State setpoint) {
                                                setpoint.velocity);
   
   // Add the feedforward to the PID output to get the motor output
-  m_pid.setReference(setpoint.position - ArmConstants.kArmOffsetRads,
+  m_pid.setReference(setpoint.position, // - ArmConstants.kArmOffsetRads,
                      ControlType.kPosition, 0, feedforward);
 }
 
-public CommandBase setArmGoalCommand(double kArmOffsetRads) {
-return Commands.runOnce(() -> setGoal(kArmOffsetRads), this);
+public CommandBase setArmGoalCommand(double goal) {
+return Commands.runOnce(() -> setArmGoal(goal), this);
 }
 
 public void set(double speed) {
   m_motor.set(m_armSlew.calculate(speed));
 }
 
-public CommandBase manualArmOrHold(double speed) {
-  return Commands.either(setArmGoalCommand(getPositionRadians()),
-                 Commands.run(()->set(speed)),
-                 ()->(Math.abs(speed) < ArmConstants.kArmDeadband));
-}
+// public CommandBase manualArmOrHold(double speed) {
+//   return Commands.either(setArmGoalCommand(getPositionRadians()).withName("auto arm"),
+//                  Commands.run(()->set(speed)).withName("manual arm"),
+//                  ()->(Math.abs(speed) < ArmConstants.kArmDeadband));
+// }
 
 @Log
 public double getPositionRadians() {
-  return m_encoder.getPosition();
+  return m_encoder.getPosition(); // + ArmConstants.kArmOffsetRads;
 }
 
-public void resetPosition() {
+public CommandBase setArmManual(DoubleSupplier speed) {
+  return Commands.run(()->setArmGoal(getArmGoal()+speed.getAsDouble()/(2*Math.PI)),this);
+}
+
+@Log
+public double getArmGoal() {
+  return m_goal;
+}
+
+public void setArmGoal(double goal) {
+  
+  m_goal = MathUtil.clamp(goal,ArmConstants.kArmOffsetRads-0.1,ArmConstants.kArmMaxRads+0.1);
+}
+
+public void resetDownPosition() {
   m_encoder.setPosition(ArmConstants.kArmOffsetRads);
+  m_goal = ArmConstants.kArmOffsetRads;
+}
+
+public void resetUpPosition() {
+  m_encoder.setPosition(ArmConstants.kArmMaxRads);
+  m_goal = ArmConstants.kArmMaxRads;
 }
 
 @Log
 public boolean isArmDown() {
   return m_motor.getReverseLimitSwitch(Type.kNormallyOpen).isPressed();
 }
+
+@Log
+public boolean isArmUp() {
+  return m_motor.getForwardLimitSwitch(Type.kNormallyOpen).isPressed();
+}
+
+public void setEncoderPosition(double position) {
+  m_encoder.setPosition(position);
+}
+
 
 
 }
