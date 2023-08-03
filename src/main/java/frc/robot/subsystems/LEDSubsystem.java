@@ -12,14 +12,14 @@ import java.util.ListIterator;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.LedConstants;
 import frc.robot.utils.led.RainbowPattern;
 import frc.robot.utils.led.SolidColorPattern;
 import frc.robot.utils.led.TrobotAddressableLED;
 import frc.robot.utils.led.TrobotAddressableLEDPattern;
 
-public class LEDSubsystem extends SubsystemBase {
+public class LEDSubsystem extends Subsystem {
   private TrobotAddressableLED m_led = new TrobotAddressableLED(LedConstants.kLedPWMPort,
                                        LedConstants.kLedCount);
 
@@ -41,7 +41,8 @@ public class LEDSubsystem extends SubsystemBase {
 
     m_patternIterator = m_patternList.listIterator();
     
-    m_currentPattern =  (DriverStation.getAlliance() == Alliance.Blue) ? m_bluePattern : m_redPattern;
+    m_currentPattern =  //(DriverStation.getAlliance() == Alliance.Blue) ?
+     m_bluePattern; // : m_redPattern;
   }
 
 

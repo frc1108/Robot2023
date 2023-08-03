@@ -5,13 +5,13 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.SliderConstants;
 
-public class Superstructure extends SubsystemBase {
+public class Superstructure extends Subsystem {
   private final ArmSubsystem m_arm;
   private final ExtenderSubsystem m_slide;
   private final ElevatorSubsystem m_elevator;
@@ -27,7 +27,7 @@ public class Superstructure extends SubsystemBase {
   }
 
 // 1
-  public CommandBase scoreCubeAutoCommand(){
+  public Command scoreCubeAutoCommand(){
     return Commands.sequence(
       Commands.print("Score auto cube"),
       m_claw.gripCommand(),
@@ -49,27 +49,27 @@ public class Superstructure extends SubsystemBase {
   }
 
 // 6  
-  public CommandBase overTopSubstationCommand(){
+  public Command overTopSubstationCommand(){
     return Commands.none();
   }
 
 // 2
-  public CommandBase floorPickupCommand(){
+  public Command floorPickupCommand(){
     return Commands.none();
   }
 
 // 5
-  public CommandBase highGoalCommand(){
+  public Command highGoalCommand(){
     return Commands.none();
   }
 
 // 4 
-  public CommandBase midGoalCommand(){
+  public Command midGoalCommand(){
     return Commands.none();
   }
 
 // 3
-  public CommandBase lowGoalCommand(){
+  public Command lowGoalCommand(){
     return Commands.none();
   }
 

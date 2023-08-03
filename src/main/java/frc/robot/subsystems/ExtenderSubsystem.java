@@ -19,7 +19,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants.SliderConstants;
@@ -104,7 +104,7 @@ public double getPositionMeters() {
   return m_encoder.getPosition() + SliderConstants.kSliderOffsetMeters;
 }
 
-public CommandBase setSliderManual(DoubleSupplier speed) {
+public Command setSliderManual(DoubleSupplier speed) {
   return Commands.run(()->setSliderGoal(getSliderGoal()+(speed.getAsDouble()*(Units.inchesToMeters(24)/50))),this);
 }
 
@@ -117,7 +117,7 @@ public void setSliderGoal(double goal) {
   m_goal = MathUtil.clamp(goal,SliderConstants.kSliderMaxMeters,SliderConstants.kSliderOffsetMeters);
 }
 
-public CommandBase setSliderGoalCommand(double goal) {
+public Command setSliderGoalCommand(double goal) {
   return Commands.runOnce(() -> setSliderGoal(goal),this);
   }
 

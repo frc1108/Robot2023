@@ -7,12 +7,12 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.REVPHConstants;
 import io.github.oblarg.oblog.Loggable;
 
-public class ElevatorSubsystem extends SubsystemBase implements Loggable {
+public class ElevatorSubsystem extends Subsystem implements Loggable {
 
   private final DoubleSolenoid m_piston = new DoubleSolenoid(
                                             PneumaticsModuleType.REVPH,
@@ -29,11 +29,11 @@ public class ElevatorSubsystem extends SubsystemBase implements Loggable {
     // This method will be called once per scheduler run
   }
 
-  public CommandBase upCommand() {
+  public Command upCommand() {
     return runOnce(() -> m_piston.set(Value.kForward)).withName("Elevator Out");
   }
 
-  public CommandBase downCommand() {
+  public Command downCommand() {
     return runOnce(() -> m_piston.set(Value.kReverse)).withName("Elevator In");
   }
 }

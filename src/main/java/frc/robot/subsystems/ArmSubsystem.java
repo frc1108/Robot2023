@@ -19,7 +19,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.SparkMaxCanId;
@@ -119,7 +119,7 @@ public void useState(TrapezoidProfile.State setpoint) {
                      ControlType.kPosition, 0, feedforward);
 }
 
-public CommandBase setArmGoalCommand(double goal) {
+public Command setArmGoalCommand(double goal) {
 return Commands.runOnce(() -> setArmGoal(goal), this);
 }
 
@@ -138,7 +138,7 @@ public double getPositionRadians() {
   return m_encoder.getPosition(); // + ArmConstants.kArmOffsetRads;
 }
 
-public CommandBase setArmManual(DoubleSupplier speed) {
+public Command setArmManual(DoubleSupplier speed) {
   return Commands.run(()->setArmGoal(getArmGoal()+speed.getAsDouble()/(2*Math.PI)),this);
 }
 

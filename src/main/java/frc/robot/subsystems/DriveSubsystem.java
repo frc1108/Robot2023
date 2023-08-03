@@ -26,11 +26,11 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.utils.SwerveUtils;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
-public class DriveSubsystem extends SubsystemBase implements Loggable {
+public class DriveSubsystem extends Subsystem implements Loggable {
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
@@ -274,7 +274,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
            );
   }
 
-  public CommandBase autoBalance() {
+  public Command autoBalance() {
     return Commands.race(
         Commands.sequence(
           Commands.run(
@@ -289,7 +289,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
       //   ()->this.drive(0,0,0,true,true),this));
   }
   
-  public CommandBase autoBalanceBackwards() {
+  public Command autoBalanceBackwards() {
     return Commands.race(
         Commands.sequence(
           Commands.run(
@@ -307,7 +307,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
 
 
   // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
-public CommandBase followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
   return Commands.sequence(Commands.runOnce(() -> {
          // Reset odometry for the first path you run during auto
          if(isFirstPath){

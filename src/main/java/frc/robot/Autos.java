@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 import frc.robot.RobotContainer;
@@ -86,7 +85,7 @@ public final class Autos {
     eventMap = buildEventMap();
   }
 
-    public CommandBase none() {
+    public Command none() {
       return Commands.none();
     }
   
@@ -95,36 +94,36 @@ public final class Autos {
     //                               new PathConstraints(4, 3)));
     // }
 
-    public CommandBase cubeBB() {
+    public Command cubeBB() {
       return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Cube Balance",
                                   new PathConstraints(4, 3)));
     }
     
-    public CommandBase speedBump() {
+    public Command speedBump() {
       return autoBuilder.fullAuto(PathPlanner.loadPathGroup("Speedbump",
       new PathConstraints(4, 3)));      
     }
 
-    public CommandBase driveTurn() {
+    public Command driveTurn() {
       return autoBuilder.fullAuto(PathPlanner.loadPathGroup("StraightTurn",
       new PathConstraints(3, 2)));      
     }
 
-    public CommandBase driveTurnSpeedBump() {
+    public Command driveTurnSpeedBump() {
       return autoBuilder.fullAuto(PathPlanner.loadPathGroup("StraightTurnSpeedBump",
       new PathConstraints(4, 3)));      
     }
 
-    public CommandBase bigSpeedBump() {
+    public Command bigSpeedBump() {
       return autoBuilder.fullAuto(PathPlanner.loadPathGroup("BigSpeedBump",
       new PathConstraints(0.8, 2)));      
     }
 
-    public CommandBase cubeCenter() {
+    public Command cubeCenter() {
       return m_superS.scoreCubeAutoCommand().andThen(m_swerve.autoBalance());
     }
     
-    public CommandBase cubeCenterBackwards() {
+    public Command cubeCenterBackwards() {
       return m_superS.scoreCubeAutoCommand().andThen(m_swerve.autoBalanceBackwards());
     }
   

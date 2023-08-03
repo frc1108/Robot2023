@@ -6,10 +6,10 @@ package frc.robot.subsystems;
 
 import org.photonvision.PhotonCamera;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import io.github.oblarg.oblog.Loggable;
 
-public class VisionSubsystem extends SubsystemBase implements Loggable {
+public class VisionSubsystem extends Subsystem implements Loggable {
 
   public PhotonCamera m_driverCamera = new PhotonCamera("driverCamera");
   public PhotonCamera m_tagCamera = new PhotonCamera("tagCamera");

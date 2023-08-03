@@ -7,12 +7,12 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants.REVPHConstants;
 import io.github.oblarg.oblog.Loggable;
 
-public class ClawSubsystem extends SubsystemBase implements Loggable {
+public class ClawSubsystem extends Subsystem implements Loggable {
 
   private final DoubleSolenoid m_piston = new DoubleSolenoid(
     PneumaticsModuleType.REVPH,
@@ -29,11 +29,11 @@ public class ClawSubsystem extends SubsystemBase implements Loggable {
     // This method will be called once per scheduler run
   }
 
-  public CommandBase gripCommand() {
+  public Command gripCommand() {
     return runOnce(() -> m_piston.set(Value.kForward)).withName("Claw Closed");
   }
 
-  public CommandBase releaseCommand() {
+  public Command releaseCommand() {
     return runOnce(() -> m_piston.set(Value.kReverse)).withName("Claw Open");
   }
 }
