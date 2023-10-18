@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.utils.SwerveUtils;
@@ -53,7 +54,8 @@ public class DriveSubsystem extends Subsystem implements Loggable {
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+  //private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+  private final Pigeon2 m_gyro = new Pigeon2(0);
 
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -263,14 +265,15 @@ public class DriveSubsystem extends Subsystem implements Loggable {
 
   @Log
   public double getRobotPitch() {
-    return m_gyro.getXComplementaryAngle();
+    //return m_gyro.getXComplementaryAngle();
+    return m_gyro.getPitch().getValue();
 
   }
   @Log
   public double getPitch() {
     return Math.sqrt(
-             Math.pow(m_filterX.calculate(m_gyro.getXComplementaryAngle()),2)+
-             Math.pow(m_filterY.calculate(m_gyro.getYComplementaryAngle()),2)
+             Math.pow(m_filterX.calculate(m_gyro.getPitch().getValue()),2)+
+             Math.pow(m_filterY.calculate(m_gyro.getRoll().getValue()),2)
            );
   }
 
